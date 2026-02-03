@@ -3,376 +3,640 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Случайные карты</title>
+  <title>Случайные карты — прототип</title>
   <style>
-    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    body { margin: 0; background: #f6f7fb; }
-    .wrap { max-width: 920px; margin: 0 auto; padding: 16px; }
-    .card { background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.08); }
-    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    .btn { border: 0; border-radius: 12px; padding: 12px 14px; cursor: pointer; font-weight: 600; }
-    .btnPrimary { background: #111827; color: #fff; }
-    .btnGhost { background: #eef2ff; color: #111827; }
-    .muted { color: #6b7280; font-size: 14px; }
-    .hr { height: 1px; background: #eef2f7; margin: 14px 0; }
-    .progress { height: 10px; background: #eef2f7; border-radius: 999px; overflow: hidden; }
-    .bar { height: 100%; width: 0%; background: #111827; transition: width .25s ease; }
-    .taskTitle { font-size: 18px; font-weight: 800; margin: 0 0 8px; }
-    .taskText { font-size: 16px; margin: 0 0 10px; white-space: pre-wrap; }
-    img { max-width: 100%; border-radius: 12px; }
-    audio { width: 100%; }
-    textarea { width: 100%; min-height: 88px; border-radius: 12px; border: 1px solid #e5e7eb; padding: 10px; font-size: 16px; }
-    .pill { display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; border-radius: 999px; background: #f3f4f6; font-size: 13px; }
-    .ok { outline: 3px solid rgba(16,185,129,.35); }
-    .bad { outline: 3px solid rgba(239,68,68,.35); }
-    .feedback { font-weight: 700; margin-top: 10px; }
-    .feedback.okT { color: #059669; }
-    .feedback.badT { color: #dc2626; }
-    .hidden { display: none; }
+    :root{
+      --bg:#0b1020;
+      --panel:#121a33;
+      --panel2:#0f1630;
+      --text:#eaf0ff;
+      --muted:#a9b6e6;
+      --ok:#2dd27d;
+      --bad:#ff4d4d;
+      --accent:#6aa4ff;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    body{margin:0;background:radial-gradient(1200px 600px at 20% 10%, #1c2a5e 0%, var(--bg) 55%), var(--bg); color:var(--text)}
+    .wrap{max-width:980px;margin:0 auto;padding:18px}
+    .topbar{
+      display:flex;gap:14px;align-items:center;justify-content:space-between;
+      padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius);box-shadow:var(--shadow);
+    }
+    .left{display:flex;flex-direction:column;gap:6px}
+    .title{font-weight:700;font-size:16px}
+    .subtitle{color:var(--muted);font-size:12px}
+    .right{display:flex;align-items:center;gap:12px}
+    .counter{font-size:13px;color:var(--muted)}
+    .timer{
+      display:none;
+      padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10); color:var(--text); font-size:13px;
+    }
+    .progress{
+      width:240px;height:10px;border-radius:999px;overflow:hidden;
+      background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);
+    }
+    .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#9b7bff);transition:width .25s ease}
+    .grid{display:grid;grid-template-columns: 1fr 1.2fr;gap:16px;margin-top:16px}
+    @media (max-width: 900px){.grid{grid-template-columns:1fr}}
+    .card{
+      background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;
+    }
+    .card-header{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}
+    .card-header .h{font-weight:700}
+    .card-body{padding:16px}
+    .deck{
+      display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;
+      padding:20px;min-height:320px;text-align:center;
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+      border-radius:var(--radius);
+      border:1px dashed rgba(255,255,255,.18);
+      cursor:pointer; user-select:none;
+      transition:transform .08s ease, border-color .15s ease;
+    }
+    .deck:hover{border-color:rgba(255,255,255,.35)}
+    .deck:active{transform:translateY(1px) scale(.995)}
+    .deck .emoji{font-size:44px}
+    .deck .big{font-weight:800;font-size:18px}
+    .deck .small{color:var(--muted);font-size:13px}
+    .task{
+      display:flex;flex-direction:column;gap:12px;
+    }
+    .prompt{
+      padding:12px 12px;border-radius:12px;background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .prompt .label{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .prompt .content{font-size:16px;line-height:1.35}
+    .prompt img{max-width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.10)}
+    audio{width:100%}
+    .answer{
+      padding:12px 12px;border-radius:12px;background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .answer .label{font-size:12px;color:var(--muted);margin-bottom:8px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    input[type="text"]{
+      flex:1;min-width:220px;
+      background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);
+      color:var(--text);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;
+    }
+    input[type="text"]:focus{border-color:rgba(106,164,255,.6);box-shadow:0 0 0 3px rgba(106,164,255,.12)}
+    .btn{
+      padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06); color:var(--text); cursor:pointer;
+      font-weight:650; font-size:14px;
+      transition:transform .08s ease, background .15s ease, border-color .15s ease;
+    }
+    .btn:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.22)}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:linear-gradient(90deg,rgba(106,164,255,.35),rgba(155,123,255,.28));border-color:rgba(106,164,255,.35)}
+    .btn.ghost{background:transparent}
+    .feedback{
+      display:none;
+      padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.10);
+      font-size:14px;font-weight:650;
+    }
+    .feedback.ok{display:block;background:rgba(45,210,125,.14);border-color:rgba(45,210,125,.35);color:var(--ok)}
+    .feedback.bad{display:block;background:rgba(255,77,77,.12);border-color:rgba(255,77,77,.35);color:var(--bad)}
+    .muted{color:var(--muted);font-size:13px;line-height:1.35}
+    .hidden{display:none !important}
+    .end{
+      display:none;
+      padding:28px 18px; text-align:center;
+    }
+    .end .boom{font-size:46px}
+    .end .h1{font-size:22px;font-weight:900;margin-top:10px}
+    .end .p{color:var(--muted);margin-top:8px}
+    .stats{margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .chip{
+      padding:8px 10px;border-radius:999px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);
+      color:var(--text);font-size:13px;
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="row" style="justify-content:space-between;">
-        <div>
-          <div class="muted">Расширение</div>
-          <div style="font-size:20px;font-weight:900;">Случайные карты</div>
-        </div>
-        <div class="row">
-          <span id="timerPill" class="pill hidden">⏱ <span id="timerText"></span></span>
-          <span class="pill">🃏 <span id="counterText">0/0</span></span>
-        </div>
-      </div>
-
-      <div class="hr"></div>
-
-      <div class="progress" aria-label="progress">
-        <div id="bar" class="bar"></div>
-      </div>
-
-      <div class="hr"></div>
-
-      <div class="row">
-        <button id="drawBtn" class="btn btnPrimary">Открыть карту</button>
-        <button id="resetBtn" class="btn btnGhost">Сброс</button>
-        <span id="hint" class="muted"></span>
-      </div>
-
-      <div class="hr"></div>
-
-      <div id="taskBox">
-        <p class="muted">Нажмите «Открыть карту», чтобы получить задание.</p>
-      </div>
-
-      <div id="answerBox" class="hidden">
-        <div class="hr"></div>
-        <div id="answerUI"></div>
-        <div class="row" style="margin-top:10px;">
-          <button id="checkBtn" class="btn btnPrimary">Проверить</button>
-          <button id="nextBtn" class="btn btnGhost hidden">Следующая карта</button>
-        </div>
-        <div id="fb" class="feedback"></div>
-      </div>
-
-      <div id="finishBox" class="hidden">
-        <div class="hr"></div>
-        <div style="font-size:22px;font-weight:900;">🎉 Колода завершена!</div>
-        <p class="muted" style="margin:6px 0 0;">Финальные фанфары 😄</p>
-      </div>
+<div class="wrap">
+  <div class="topbar">
+    <div class="left">
+      <div class="title" id="uiTitle">Случайные карты</div>
+      <div class="subtitle" id="uiSubtitle">Нажмите на колоду, чтобы открыть случайную карту</div>
+    </div>
+    <div class="right">
+      <div class="counter" id="uiCounter">0 / 0</div>
+      <div class="timer" id="uiTimer">⏱ 00:00</div>
+      <div class="progress" aria-label="Прогресс"><div class="bar" id="uiBar"></div></div>
     </div>
   </div>
 
+  <div class="grid">
+    <!-- Левая панель: колода -->
+    <div class="card">
+      <div class="card-header">
+        <div class="h">Колода</div>
+        <button class="btn ghost" id="btnRestart">Сначала</button>
+      </div>
+      <div class="card-body">
+        <div class="deck" id="deck">
+          <div class="emoji">🂠</div>
+          <div class="big" id="deckText">Открыть карту</div>
+          <div class="small" id="deckHint">Карты не повторяются</div>
+        </div>
+        <div class="muted" style="margin-top:12px" id="rulesHint"></div>
+      </div>
+    </div>
+
+    <!-- Правая панель: карта/задание -->
+    <div class="card">
+      <div class="card-header">
+        <div class="h">Карта</div>
+        <div class="muted" id="cardMeta">—</div>
+      </div>
+      <div class="card-body">
+        <div id="taskArea" class="task hidden">
+          <div class="prompt">
+            <div class="label">Задание</div>
+            <div class="content" id="promptContent"></div>
+          </div>
+
+          <div class="answer" id="answerBlock">
+            <div class="label" id="answerLabel">Ответ</div>
+
+            <div id="textAnswer" class="row hidden">
+              <input id="answerInput" type="text" placeholder="Введите ответ..." />
+              <button class="btn primary" id="btnCheck">Проверить</button>
+              <button class="btn" id="btnNext" disabled>Дальше</button>
+            </div>
+
+            <div id="oralAnswer" class="row hidden">
+              <div class="muted" id="oralHint">Ответьте устно. Затем нажмите “Дальше”.</div>
+              <button class="btn primary" id="btnNextOral">Дальше</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+          </div>
+        </div>
+
+        <div id="emptyState" class="muted">
+          Здесь появится карта после клика по колоде.
+        </div>
+
+        <div id="endScreen" class="end">
+          <div class="boom">🎉</div>
+          <div class="h1" id="endTitle">Готово!</div>
+          <div class="p" id="endText">Вы прошли все карты.</div>
+          <div class="stats" id="endStats"></div>
+          <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+            <button class="btn primary" id="btnRestart2">Сыграть ещё раз</button>
+          </div>
+          <audio id="fanfare" preload="auto"></audio>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /**
- * НАСТРОЙКА ПОД ВАШЕ ТЗ:
- * - количество карт, типы заданий (текст/картинка/аудио) :contentReference[oaicite:2]{index=2}
- * - ответы (текстовое поле / устный ответ) :contentReference[oaicite:3]{index=3}
- * - таймер (опционал:contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
- * - фидбек (опционал:contentReference[oaicite:6]{index=6}:contentReference[oaicite:7]{index=7}
+ * CONFIG — будущая точка подключения редактора.
+ * Редактор будет изменять этот объект (или подгружать JSON).
  */
 const CONFIG = {
-  noRepeats: true:contentReference[oaicite:8]{index=8}ез таймера, например 60
-  r:contentReference[oaicite:9]{index=9} // если true — можно завершать по кол-ву верных
-  targetCorrect: 0, // например 5 (используется если requireCorrectToFinish=true)
+  meta: {
+    title: "Случайные карты",
+    subtitle: "Нажмите на колоду, чтобы открыть случайную карту",
+  },
+  settings: {
+    // Основное:
+    preventRepeats: true,          // Запрет повторов карт
+    maxCardsToShow: 0,             // 0 = показать все карты из массива; иначе ограничить количество открываемых карт
+    requiredCorrect: 0,            // 0 = не использовать; иначе закончить при достижении N верных ответов
 
+    // Проверка и фидбек:
+    enableAutoCheck: true,         // Для текстовых ответов: включить автопроверку
+    caseSensitive: false,          // Сравнение с учетом регистра
+    trimAndNormalize: true,        // Удалять лишние пробелы/нормализовать
+    successText: "Верно",
+    errorText: "Попробуй ещё раз",
+
+    // Таймер:
+    timerEnabled: false,           // Показывать таймер
+    timerMode: "perCard",          // "perCard" | "overall"
+    timerSeconds: 30,              // длительность (сек) на карту или на игру
+    onTimeUp: "autoNext",          // "autoNext" | "markWrong" | "endGame"
+
+    // Финал:
+    endTitle: "Готово!",
+    endTextAll: "Вы прошли все карты.",
+    endTextCorrect: (n) => `Вы набрали ${n} верных ответов!`,
+    fanfareUrl: ""                 // URL фанфар (mp3/ogg). Можно оставить пустым.
+  },
+
+  // Карты: тип задания (text/image/audio) + тип ответа (text/oral)
   cards: [
     {
       id: "c1",
-      type: "text", // text | image | audio
-      prompt: "Скажи 3 слова на тему «Путешествия».",
-      answerMode: "spoken", // text | spoken
-      // correctAnswers: ["..."] // если хотите автопроверку текста
+      prompt: { type: "text", value: "Переведи на английский: «Я люблю учиться»." },
+      answer: { type: "text", value: "I love to study" }
     },
     {
       id: "c2",
-      type: "image",
-      prompt: "Опиши, что изображено на картинке (2–3 предложения).",
-      mediaUrl: "https://picsum.photos/900/420",
-      answerMode: "text",
-      correctAnswers: [] // пусто => без автопроверки, только «выполнено»
+      prompt: { type: "image", value: "https://images.unsplash.com/photo-1520975682031-a2c4d8c8cc2d?w=1200&q=80&auto=format&fit=crop" },
+      answer: { type: "oral", value: "" }
     },
     {
       id: "c3",
-      type: "audio",
-      prompt: "Прослушай и повтори фразу.",
-      mediaUrl: "https://www.w3schools.com/html/horse.ogg",
-      answerMode: "spoken"
-    },
+      prompt: { type: "audio", value: "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3" },
+      answer: { type: "text", value: "t-rex" }
+    }
   ]
 };
 
-// ---------- логика ----------
-const state = {
-  order: [],
-  idx: -1,
-  correct: 0,
-  timer: null,
-  left: 0
+/* ========= Внутреннее состояние игры ========= */
+const STATE = {
+  deck: [],            // индексы доступных карт
+  shown: 0,            // сколько открыто
+  correct: 0,          // сколько верных (автопроверка)
+  currentCard: null,   // объект карты
+  started: false,
+
+  timer: {
+    enabled: false,
+    mode: "perCard",
+    totalSeconds: 0,
+    remaining: 0,
+    intervalId: null
+  }
 };
 
-const $ = (id) => document.getElementById(id);
-const drawBtn = $("drawBtn");
-const resetBtn = $("resetBtn");
-const checkBtn = $("checkBtn");
-const nextBtn = $("nextBtn");
-const taskBox = $("taskBox");
-const answerBox = $("answerBox");
-const answerUI = $("answerUI");
-const fb = $("fb");
-const bar = $("bar");
-const counterText = $("counterText");
-const hint = $("hint");
-const finishBox = $("finishBox");
-const timerPill = $("timerPill");
-const timerText = $("timerText");
+/* ========= UI элементы ========= */
+const uiTitle = document.getElementById("uiTitle");
+const uiSubtitle = document.getElementById("uiSubtitle");
+const uiCounter = document.getElementById("uiCounter");
+const uiBar = document.getElementById("uiBar");
+const uiTimer = document.getElementById("uiTimer");
 
-function shuffle(arr){
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+const deckEl = document.getElementById("deck");
+const deckText = document.getElementById("deckText");
+const deckHint = document.getElementById("deckHint");
+const rulesHint = document.getElementById("rulesHint");
+
+const taskArea = document.getElementById("taskArea");
+const emptyState = document.getElementById("emptyState");
+const cardMeta = document.getElementById("cardMeta");
+const promptContent = document.getElementById("promptContent");
+
+const answerBlock = document.getElementById("answerBlock");
+const answerLabel = document.getElementById("answerLabel");
+const textAnswer = document.getElementById("textAnswer");
+const oralAnswer = document.getElementById("oralAnswer");
+
+const answerInput = document.getElementById("answerInput");
+const btnCheck = document.getElementById("btnCheck");
+const btnNext = document.getElementById("btnNext");
+const btnNextOral = document.getElementById("btnNextOral");
+const feedback = document.getElementById("feedback");
+
+const btnRestart = document.getElementById("btnRestart");
+const btnRestart2 = document.getElementById("btnRestart2");
+
+const endScreen = document.getElementById("endScreen");
+const endTitle = document.getElementById("endTitle");
+const endText = document.getElementById("endText");
+const endStats = document.getElementById("endStats");
+const fanfare = document.getElementById("fanfare");
+
+/* ========= Инициализация ========= */
+function initFromConfig() {
+  uiTitle.textContent = CONFIG.meta.title || "Случайные карты";
+  uiSubtitle.textContent = CONFIG.meta.subtitle || "";
+
+  STATE.timer.enabled = !!CONFIG.settings.timerEnabled;
+  STATE.timer.mode = CONFIG.settings.timerMode || "perCard";
+  STATE.timer.totalSeconds = Number(CONFIG.settings.timerSeconds || 0);
+  uiTimer.style.display = STATE.timer.enabled ? "inline-flex" : "none";
+
+  deckHint.textContent = CONFIG.settings.preventRepeats ? "Карты не повторяются" : "Повторы разрешены";
+
+  const maxInfo = CONFIG.settings.maxCardsToShow && CONFIG.settings.maxCardsToShow > 0
+    ? `Откроем ${CONFIG.settings.maxCardsToShow} карт(ы).`
+    : `Откроем все карты: ${CONFIG.cards.length}.`;
+
+  const goalInfo = CONFIG.settings.requiredCorrect && CONFIG.settings.requiredCorrect > 0
+    ? `Цель: ${CONFIG.settings.requiredCorrect} верных ответов.`
+    : "Цели по верным ответам нет.";
+
+  rulesHint.textContent = `${maxInfo} ${goalInfo}`;
+
+  if (CONFIG.settings.fanfareUrl) fanfare.src = CONFIG.settings.fanfareUrl;
 }
 
-function initDeck(){
-  const ids = CONFIG.cards.map(c => c.id);
-  state.order = shuffle(ids);
-  state.idx = -1;
-  state.correct = 0;
+/* ========= Колода / случайность ========= */
+function resetGame() {
   stopTimer();
-  state.left = CONFIG.timerSeconds || 0;
-  finishBox.classList.add("hidden");
-  answerBox.classList.add("hidden");
-  nextBtn.classList.add("hidden");
-  fb.textContent = "";
-  taskBox.innerHTML = `<p class="muted">Нажмите «Открыть карту», чтобы получить задание.</p>`;
-  updateProgress();
-  updateHint();
-  updateTimerUI();
-}
 
-function currentCard(){
-  if (state.idx < 0) return null;
-  const id = state.order[state.idx];
-  return CONFIG.cards.find(c => c.id === id) || null;
-}
+  STATE.deck = CONFIG.cards.map((_, idx) => idx);
+  STATE.shown = 0;
+  STATE.correct = 0;
+  STATE.currentCard = null;
+  STATE.started = false;
 
-function updateProgress(){
-  const total = CONFIG.cards.length;
-  const shown = Math.max(0, state.idx + 1);
-  counterText.textContent = `${shown}/${total}`;
-  const pct = total ? Math.round((shown / total) * 100) : 0;
-  bar.style.width = `${pct}%`;
-}
+  taskArea.classList.add("hidden");
+  emptyState.classList.remove("hidden");
+  endScreen.style.display = "none";
 
-function updateHint(){
-  if (CONFIG.requireCorrectToFinish && CONFIG.targetCorrect > 0){
-    hint.textContent = `Цель: ${state.correct}/${CONFIG.targetCorrect} верных`;
+  feedback.className = "feedback";
+  feedback.textContent = "";
+  btnNext.disabled = true;
+  answerInput.value = "";
+
+  updateProgressUI();
+  deckText.textContent = "Открыть карту";
+  cardMeta.textContent = "—";
+
+  if (STATE.timer.enabled && STATE.timer.mode === "overall") {
+    STATE.timer.remaining = STATE.timer.totalSeconds;
+    renderTimer();
   } else {
-    hint.textContent = CONFIG.noRepeats ? "Повторы отключены" : "Повторы разрешены";
+    uiTimer.textContent = "⏱ 00:00";
   }
 }
 
-function updateTimerUI(){
-  if (CONFIG.timerSeconds > 0){
-    timerPill.classList.remove("hidden");
-    timerText.textContent = formatTime(state.left);
+function getMaxToShow() {
+  const m = Number(CONFIG.settings.maxCardsToShow || 0);
+  if (m > 0) return Math.min(m, CONFIG.cards.length);
+  return CONFIG.cards.length;
+}
+
+function drawRandomCard() {
+  const allowRepeats = !CONFIG.settings.preventRepeats;
+
+  if (allowRepeats) {
+    const idx = Math.floor(Math.random() * CONFIG.cards.length);
+    return CONFIG.cards[idx];
+  }
+
+  if (STATE.deck.length === 0) return null;
+  const r = Math.floor(Math.random() * STATE.deck.length);
+  const idx = STATE.deck.splice(r, 1)[0];
+  return CONFIG.cards[idx];
+}
+
+/* ========= Отрисовка карты ========= */
+function renderCard(card) {
+  STATE.currentCard = card;
+
+  emptyState.classList.add("hidden");
+  endScreen.style.display = "none";
+  taskArea.classList.remove("hidden");
+
+  // meta
+  cardMeta.textContent = `ID: ${card.id || "—"}`;
+
+  // prompt
+  promptContent.innerHTML = "";
+  if (card.prompt.type === "text") {
+    promptContent.textContent = card.prompt.value || "";
+  } else if (card.prompt.type === "image") {
+    const img = document.createElement("img");
+    img.alt = "Изображение задания";
+    img.src = card.prompt.value || "";
+    promptContent.appendChild(img);
+  } else if (card.prompt.type === "audio") {
+    const audio = document.createElement("audio");
+    audio.controls = true;
+    audio.src = card.prompt.value || "";
+    promptContent.appendChild(audio);
   } else {
-    timerPill.classList.add("hidden");
+    promptContent.textContent = "Неизвестный тип задания";
+  }
+
+  // answer UI
+  feedback.className = "feedback";
+  feedback.textContent = "";
+  btnNext.disabled = true;
+  answerInput.value = "";
+
+  const aType = card.answer?.type || "oral";
+  if (aType === "text") {
+    answerLabel.textContent = "Введите ответ";
+    textAnswer.classList.remove("hidden");
+    oralAnswer.classList.add("hidden");
+
+    const canAutoCheck = !!CONFIG.settings.enableAutoCheck;
+    btnCheck.style.display = canAutoCheck ? "inline-flex" : "none";
+    btnNext.disabled = canAutoCheck; // если автопроверка — сначала проверка, затем "Дальше"
+    if (!canAutoCheck) btnNext.disabled = false; // без автопроверки — просто дальше
+  } else {
+    answerLabel.textContent = "Устный ответ";
+    textAnswer.classList.add("hidden");
+    oralAnswer.classList.remove("hidden");
+  }
+
+  // timer per card
+  if (STATE.timer.enabled && STATE.timer.mode === "perCard") {
+    STATE.timer.remaining = STATE.timer.totalSeconds;
+    startTimer();
   }
 }
 
-function formatTime(sec){
-  const m = String(Math.floor(sec/60)).padStart(2,"0");
-  const s = String(sec%60).padStart(2,"0");
-  return `${m}:${s}`;
+/* ========= Проверка ответа ========= */
+function normalize(s) {
+  if (s == null) return "";
+  let out = String(s);
+  if (CONFIG.settings.trimAndNormalize) {
+    out = out.trim().replace(/\s+/g, " ");
+  }
+  if (!CONFIG.settings.caseSensitive) {
+    out = out.toLowerCase();
+  }
+  return out;
 }
 
-function startTimer(){
-  if (CONFIG.timerSeconds <= 0) return;
+function checkAnswer() {
+  const card = STATE.currentCard;
+  if (!card) return;
+
+  const user = normalize(answerInput.value);
+  const right = normalize(card.answer?.value || "");
+
+  const ok = user.length > 0 && user === right;
+
+  if (ok) {
+    feedback.className = "feedback ok";
+    feedback.textContent = CONFIG.settings.successText || "Верно";
+    STATE.correct += 1;
+    btnNext.disabled = false;
+  } else {
+    feedback.className = "feedback bad";
+    feedback.textContent = CONFIG.settings.errorText || "Попробуй ещё раз";
+    btnNext.disabled = true;
+  }
+
+  updateProgressUI();
+  // критерий завершения по правильным
+  if (CONFIG.settings.requiredCorrect > 0 && STATE.correct >= CONFIG.settings.requiredCorrect) {
+    finishGame("correct");
+  }
+}
+
+/* ========= Переход к следующей ========= */
+function nextCard() {
+  const maxToShow = getMaxToShow();
+
+  if (!STATE.started) {
+    STATE.started = true;
+    if (STATE.timer.enabled && STATE.timer.mode === "overall") {
+      startTimer();
+    }
+  }
+
+  // если уже показали достаточно — финал
+  if (STATE.shown >= maxToShow) {
+    finishGame("all");
+    return;
+  }
+
+  const card = drawRandomCard();
+  if (!card) {
+    finishGame("all");
+    return;
+  }
+
+  STATE.shown += 1;
+  updateProgressUI();
+  renderCard(card);
+}
+
+/* ========= Прогресс ========= */
+function updateProgressUI() {
+  const maxToShow = getMaxToShow();
+  uiCounter.textContent = `${Math.min(STATE.shown, maxToShow)} / ${maxToShow}`;
+
+  const p = maxToShow > 0 ? (Math.min(STATE.shown, maxToShow) / maxToShow) * 100 : 0;
+  uiBar.style.width = `${p}%`;
+
+  // надпись на колоде
+  if (STATE.shown >= maxToShow) {
+    deckText.textContent = "Колода завершена";
+  } else {
+    deckText.textContent = STATE.shown === 0 ? "Открыть карту" : "Следующая карта";
+  }
+}
+
+/* ========= Таймер ========= */
+function renderTimer() {
+  const t = Math.max(0, STATE.timer.remaining);
+  const mm = String(Math.floor(t / 60)).padStart(2, "0");
+  const ss = String(t % 60).padStart(2, "0");
+  uiTimer.textContent = `⏱ ${mm}:${ss}`;
+}
+
+function stopTimer() {
+  if (STATE.timer.intervalId) clearInterval(STATE.timer.intervalId);
+  STATE.timer.intervalId = null;
+}
+
+function handleTimeUp() {
+  const mode = CONFIG.settings.onTimeUp || "autoNext";
+
+  if (mode === "endGame") {
+    finishGame("time");
+    return;
+  }
+
+  if (mode === "markWrong") {
+    // просто переходим дальше (для автопроверки это будет "неверно")
+    // можно расширить: считать как ошибку отдельно
+  }
+
+  // autoNext / markWrong:
+  nextCard();
+}
+
+function startTimer() {
   stopTimer();
-  state.left = CONFIG.timerSeconds;
-  updateTimerUI();
-  state.timer = setInterval(() => {
-    state.left -= 1;
-    updateTimerUI();
-    if (state.left <= 0){
+  if (!STATE.timer.enabled || STATE.timer.totalSeconds <= 0) return;
+
+  renderTimer();
+  STATE.timer.intervalId = setInterval(() => {
+    STATE.timer.remaining -= 1;
+    renderTimer();
+    if (STATE.timer.remaining <= 0) {
       stopTimer();
-      showFeedback(false, "Время вышло");
-      // разрешаем идти дальше
-      nextBtn.classList.remove("hidden");
-      checkBtn.disabled = true;
+      handleTimeUp();
     }
   }, 1000);
 }
 
-function stopTimer(){
-  if (state.timer){
-    clearInterval(state.timer);
-    state.timer = null;
-  }
-}
-
-function renderCard(card){
-  fb.textContent = "";
-  fb.className = "feedback";
-  answerBox.classList.remove("hidden");
-  nextBtn.classList.add("hidden");
-  checkBtn.disabled = false;
-
-  // контент задания
-  let mediaHTML = "";
-  if (card.type === "image" && card.mediaUrl){
-    mediaHTML = `<img alt="" src="${escapeHtml(card.mediaUrl)}" />`;
-  }
-  if (card.type === "audio" && card.mediaUrl){
-    mediaHTML = `<audio controls src="${escapeHtml(card.mediaUrl)}"></audio>`;
-  }
-
-  taskBox.innerHTML = `
-    <div>
-      <div class="taskTitle">Карта ${state.idx + 1}</div>
-      <div class="taskText">${escapeHtml(card.prompt || "")}</div>
-      ${mediaHTML}
-    </div>
-  `;
-
-  // UI ответа
-  if (card.answerMode === "text"){
-    answerUI.innerHTML = `
-      <div class="muted" style="margin-bottom:6px;">Ответ (текст)</div>
-      <textarea id="answerText" placeholder="Введите ответ..."></textarea>
-    `;
-  } else { // spoken
-    answerUI.innerHTML = `
-      <div class="muted">
-        Устный ответ: выполните задание вслух и нажмите «Проверить» (автопроверка не требуется).
-      </div>
-    `;
-  }
-
-  startTimer();
-}
-
-function escapeHtml(str){
-  return String(str).replace(/[&<>"']/g, s => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[s]));
-}
-
-function showFeedback(ok, text){
-  taskBox.classList.remove("ok","bad");
-  taskBox.classList.add(ok ? "ok" : "bad");
-  fb.textContent = ok ? (text || "Верно") : (text || "Попробуй ещё раз");
-  fb.classList.add(ok ? "okT" : "badT");
-}
-
-function isDeckFinished(){
-  const shownAll = (state.idx + 1) >= CONFIG.cards.length;
-  if (!CONFIG.requireCorrectToFinish) return shownAll;
-  if (CONFIG.targetCorrect > 0) return state.correct >= CONFIG.targetCorrect;
-  return shownAll;
-}
-
-function finish(){
-  stopTimer();
-  answerBox.classList.add("hidden");
-  finishBox.classList.remove("hidden");
-}
-
-function drawNext(){
-  if (isDeckFinished()) return finish();
-
-  // если повторы разрешены — просто рандомим каждый раз
-  if (!CONFIG.noRepeats){
-    state.idx = Math.min(state.idx + 1, CONFIG.cards.length - 1);
-    const card = CONFIG.cards[Math.floor(Math.random()*CONFIG.cards.length)];
-    updateProgress();
-    renderCard(card);
-    return;
-  }
-
-  state.idx += 1;
-  updateProgress();
-
-  if (state.idx >= state.order.length){
-    return finish();
-  }
-  const card = currentCard();
-  renderCard(card);
-}
-
-function checkAnswer(){
-  const card = currentCard();
+/* ========= Финал ========= */
+function finishGame(reason) {
   stopTimer();
 
-  // устный ответ: считаем "выполнено"
-  if (card.answerMode === "spoken"){
-    showFeedback(true, "Выполнено");
-    nextBtn.classList.remove("hidden");
-    checkBtn.disabled = true;
-    return;
-  }
+  taskArea.classList.add("hidden");
+  emptyState.classList.add("hidden");
+  endScreen.style.display = "block";
 
-  const el = document.getElementById("answerText");
-  const user = (el?.value || "").trim();
+  endTitle.textContent = CONFIG.settings.endTitle || "Готово!";
 
-  // если нет correctAnswers => без автопроверки
-  if (!Array.isArray(card.correctAnswers) || card.correctAnswers.length === 0){
-    showFeedback(true, "Ответ зафиксирован");
-    nextBtn.classList.remove("hidden");
-    checkBtn.disabled = true;
-    return;
-  }
-
-  const normalized = (s) => s.toLowerCase().replace(/\s+/g," ").trim();
-  const ok = card.correctAnswers.map(normalized).includes(normalized(user));
-
-  if (ok){
-    state.correct += 1;
-    updateHint();
-    showFeedback(true, "Верно");
-    nextBtn.classList.remove("hidden");
-    checkBtn.disabled = true;
-    if (isDeckFinished()) finish();
+  if (reason === "correct") {
+    const n = STATE.correct;
+    endText.textContent = typeof CONFIG.settings.endTextCorrect === "function"
+      ? CONFIG.settings.endTextCorrect(n)
+      : `Вы набрали ${n} верных ответов!`;
+  } else if (reason === "time") {
+    endText.textContent = "Время вышло.";
   } else {
-    showFeedback(false, "Попробуй ещё раз");
+    endText.textContent = CONFIG.settings.endTextAll || "Вы прошли все карты.";
+  }
+
+  endStats.innerHTML = "";
+  endStats.appendChild(chip(`Открыто: ${STATE.shown}/${getMaxToShow()}`));
+  endStats.appendChild(chip(`Верных: ${STATE.correct}`));
+  endStats.appendChild(chip(`Повторы: ${CONFIG.settings.preventRepeats ? "нет" : "да"}`));
+
+  // фанфары (если задан URL)
+  if (CONFIG.settings.fanfareUrl) {
+    try { fanfare.currentTime = 0; fanfare.play().catch(()=>{}); } catch(e){}
   }
 }
 
-drawBtn.addEventListener("click", drawNext);
-resetBtn.addEventListener("click", initDeck);
-checkBtn.addEventListener("click", checkAnswer);
-nextBtn.addEventListener("click", () => {
-  fb.textContent = "";
-  taskBox.classList.remove("ok","bad");
-  answerBox.classList.add("hidden");
-  drawNext();
+function chip(text) {
+  const d = document.createElement("div");
+  d.className = "chip";
+  d.textContent = text;
+  return d;
+}
+
+/* ========= События ========= */
+deckEl.addEventListener("click", () => {
+  // если уже на финале — не мешаем
+  if (endScreen.style.display === "block") return;
+  nextCard();
 });
 
-initDeck();
+btnCheck.addEventListener("click", checkAnswer);
+answerInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    if (btnCheck.style.display !== "none") checkAnswer();
+    else nextCard();
+  }
+});
+
+btnNext.addEventListener("click", nextCard);
+btnNextOral.addEventListener("click", nextCard);
+
+btnRestart.addEventListener("click", resetGame);
+btnRestart2.addEventListener("click", resetGame);
+
+/* ========= Старт ========= */
+initFromConfig();
+resetGame();
 </script>
 </body>
 </html>
