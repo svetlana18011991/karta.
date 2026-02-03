@@ -7,8 +7,6 @@
   <style>
     :root{
       --bg:#0b1020;
-      --panel:#121a33;
-      --panel2:#0f1630;
       --text:#eaf0ff;
       --muted:#a9b6e6;
       --ok:#2dd27d;
@@ -16,10 +14,15 @@
       --accent:#6aa4ff;
       --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius: 16px;
+
+      /* размеры карты (можно будет вынести в редактор) */
+      --cardW: 200px;
+      --cardH: 280px;
     }
     *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
     body{margin:0;background:radial-gradient(1200px 600px at 20% 10%, #1c2a5e 0%, var(--bg) 55%), var(--bg); color:var(--text)}
-    .wrap{max-width:980px;margin:0 auto;padding:18px}
+    .wrap{max-width:1040px;margin:0 auto;padding:18px}
+
     .topbar{
       display:flex;gap:14px;align-items:center;justify-content:space-between;
       padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
@@ -41,7 +44,7 @@
     }
     .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#9b7bff);transition:width .25s ease}
 
-    .grid{display:grid;grid-template-columns: 1fr 1.2fr;gap:16px;margin-top:16px}
+    .grid{display:grid;grid-template-columns: 1fr 1.25fr;gap:16px;margin-top:16px}
     @media (max-width: 900px){.grid{grid-template-columns:1fr}}
 
     .card{
@@ -55,7 +58,7 @@
     /* ===== Колода ===== */
     .deck-wrap{
       position:relative;
-      min-height:320px;
+      min-height:360px;
       display:flex;align-items:center;justify-content:center;
       border-radius:var(--radius);
       background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
@@ -69,7 +72,8 @@
 
     .deck-stack{
       position:relative;
-      width:160px;height:220px;
+      width:var(--cardW);
+      height:var(--cardH);
       filter: drop-shadow(0 18px 22px rgba(0,0,0,.35));
     }
     .deck-card{
@@ -82,8 +86,8 @@
       box-shadow: 0 10px 25px rgba(0,0,0,.35);
     }
     .deck-card:nth-child(1){ transform: translate(0px,0px) rotate(-2deg); }
-    .deck-card:nth-child(2){ transform: translate(6px,6px) rotate(1deg); opacity:.96; }
-    .deck-card:nth-child(3){ transform: translate(12px,12px) rotate(3deg); opacity:.92; }
+    .deck-card:nth-child(2){ transform: translate(7px,7px) rotate(1deg); opacity:.96; }
+    .deck-card:nth-child(3){ transform: translate(14px,14px) rotate(3deg); opacity:.92; }
 
     .deck-labels{
       margin-top:14px;
@@ -93,10 +97,21 @@
     .deck-labels .big{font-weight:800;font-size:16px}
     .deck-labels .small{color:var(--muted);font-size:13px}
 
-    /* ===== Сцена справа (карта закрепляется здесь) ===== */
+    /* ===== Сцена справа ===== */
     #cardStage{
       position:relative;
-      min-height:360px;
+      min-height:420px;
+    }
+    /* “якорь”, куда прилетает карта (чтобы не было скачка после закрепления) */
+    #stageSpot{
+      position:absolute;
+      left:50%;
+      top:26px;
+      transform:translateX(-50%);
+      width:min(100%, 680px);
+      height:calc(var(--cardH) + 180px);
+      pointer-events:none;
+      opacity:0;
     }
 
     /* ===== Flying/Stage card core ===== */
@@ -107,7 +122,8 @@
     }
     .fly-card{
       position:absolute;
-      width:160px;height:220px;
+      width:var(--cardW);
+      height:var(--cardH);
       transform-style:preserve-3d;
       will-change:transform;
     }
@@ -139,50 +155,49 @@
 
     /* ===== Закреплённая карта справа ===== */
     .stage-card{
-      width:100%;
-      max-width:560px;
+      width:min(100%, 680px);
       margin:0 auto;
       perspective:1200px;
       pointer-events:auto;
     }
     .stage-card .fly-card{
-      position:relative; /* уже не fixed */
+      position:relative;
       width:100%;
       height:auto;
-      min-height:320px;
+      min-height:420px;
     }
     .stage-card .fly-inner{
-      min-height:320px;
+      min-height:420px;
     }
     .stage-card .fly-front{
-      padding:14px;
+      padding:18px;
     }
 
-    /* ===== UI блоки внутри лицевой стороны карты ===== */
-    .task{display:flex;flex-direction:column;gap:12px;}
+    /* ===== Контент ===== */
+    .task{display:flex;flex-direction:column;gap:14px;}
     .prompt{
-      padding:12px 12px;border-radius:12px;background:rgba(255,255,255,.05);
+      padding:14px;border-radius:14px;background:rgba(255,255,255,.05);
       border:1px solid rgba(255,255,255,.10);
     }
-    .prompt .label{font-size:12px;color:var(--muted);margin-bottom:6px}
-    .prompt .content{font-size:16px;line-height:1.35}
+    .prompt .label{font-size:12px;color:var(--muted);margin-bottom:8px}
+    .prompt .content{font-size:18px;line-height:1.35}
     .prompt img{max-width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.10)}
     audio{width:100%}
 
     .answer{
-      padding:12px 12px;border-radius:12px;background:rgba(255,255,255,.05);
+      padding:14px;border-radius:14px;background:rgba(255,255,255,.05);
       border:1px solid rgba(255,255,255,.10);
     }
-    .answer .label{font-size:12px;color:var(--muted);margin-bottom:8px}
+    .answer .label{font-size:12px;color:var(--muted);margin-bottom:10px}
     .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     input[type="text"]{
-      flex:1;min-width:220px;
+      flex:1;min-width:240px;
       background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);
-      color:var(--text);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;
+      color:var(--text);border-radius:14px;padding:12px 12px;font-size:16px;outline:none;
     }
     input[type="text"]:focus{border-color:rgba(106,164,255,.6);box-shadow:0 0 0 3px rgba(106,164,255,.12)}
     .btn{
-      padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+      padding:11px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.06); color:var(--text); cursor:pointer;
       font-weight:650; font-size:14px;
       transition:transform .08s ease, background .15s ease, border-color .15s ease;
@@ -193,8 +208,9 @@
     .btn.ghost{background:transparent}
     .feedback{
       display:none;
-      padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.10);
+      padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);
       font-size:14px;font-weight:650;
+      margin-top:10px;
     }
     .feedback.ok{display:block;background:rgba(45,210,125,.14);border-color:rgba(45,210,125,.35);color:var(--ok)}
     .feedback.bad{display:block;background:rgba(255,77,77,.12);border-color:rgba(255,77,77,.35);color:var(--bad)}
@@ -252,7 +268,7 @@
       </div>
     </div>
 
-    <!-- Правая панель: карта/задание -->
+    <!-- Правая панель: карта -->
     <div class="card" id="rightPanel">
       <div class="card-header">
         <div class="h">Карта</div>
@@ -260,6 +276,7 @@
       </div>
       <div class="card-body">
         <div id="cardStage">
+          <div id="stageSpot"></div>
           <div id="stageEmpty" class="muted">Здесь появится карта после клика по колоде.</div>
         </div>
 
@@ -356,10 +373,9 @@ const deckHint = document.getElementById("deckHint");
 const rulesHint = document.getElementById("rulesHint");
 const deckStack = document.getElementById("deckStack");
 
-const rightPanel = document.getElementById("rightPanel");
 const cardMeta = document.getElementById("cardMeta");
-
 const cardStage = document.getElementById("cardStage");
+const stageSpot = document.getElementById("stageSpot");
 const stageEmpty = document.getElementById("stageEmpty");
 let stagedCardEl = null;
 
@@ -383,6 +399,11 @@ function applyCardBackToDeck() {
     else c.style.removeProperty("--back");
   });
 }
+function applyCardBackToFly(el) {
+  const url = (CONFIG.ui.cardBackUrl || "").trim();
+  if (url) el.style.setProperty("--back", `url("${url}")`);
+  else el.style.removeProperty("--back");
+}
 function normalize(s) {
   if (s == null) return "";
   let out = String(s);
@@ -400,6 +421,16 @@ function getMaxToShow() {
   const m = Number(CONFIG.settings.maxCardsToShow || 0);
   if (m > 0) return Math.min(m, CONFIG.cards.length);
   return CONFIG.cards.length;
+}
+function getCenterRect(el) {
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width/2, y: r.top + r.height/2, w: r.width, h: r.height, rect: r };
+}
+function clearStage() {
+  if (stagedCardEl) stagedCardEl.remove();
+  stagedCardEl = null;
+  stageEmpty.classList.remove("hidden");
+  cardMeta.textContent = "—";
 }
 
 /* ================= timer ================= */
@@ -462,12 +493,6 @@ function updateProgressUI() {
   uiBar.style.width = `${p}%`;
   deckText.textContent = (STATE.shown >= maxToShow) ? "Колода завершена" : (STATE.shown === 0 ? "Открыть карту" : "Следующая карта");
 }
-function clearStage() {
-  if (stagedCardEl) stagedCardEl.remove();
-  stagedCardEl = null;
-  stageEmpty.classList.remove("hidden");
-  cardMeta.textContent = "—";
-}
 function resetGame() {
   stopTimer();
   STATE.deck = CONFIG.cards.map((_, idx) => idx);
@@ -479,7 +504,6 @@ function resetGame() {
 
   endScreen.style.display = "none";
   clearStage();
-
   updateProgressUI();
 
   if (STATE.timer.enabled && STATE.timer.mode === "overall") {
@@ -629,10 +653,11 @@ function buildFrontContent(card, onNext) {
   return wrap;
 }
 
-/* ================= animation: draw & flip, then STAGE the card ================= */
+/* ================= animation: draw & flip, then stage without “отскока” ================= */
 function createFlyingCardEl() {
   const fly = document.createElement("div");
   fly.className = "fly-card";
+  applyCardBackToFly(fly);
 
   const inner = document.createElement("div");
   inner.className = "fly-inner";
@@ -643,9 +668,6 @@ function createFlyingCardEl() {
   const front = document.createElement("div");
   front.className = "fly-face fly-front";
 
-  const url = (CONFIG.ui.cardBackUrl || "").trim();
-  if (url) fly.style.setProperty("--back", `url("${url}")`);
-
   inner.appendChild(back);
   inner.appendChild(front);
   fly.appendChild(inner);
@@ -654,46 +676,42 @@ function createFlyingCardEl() {
   return { fly, inner, front };
 }
 
-function getCenterRect(el) {
-  const r = el.getBoundingClientRect();
-  return { x: r.left + r.width/2, y: r.top + r.height/2, w: r.width, h: r.height };
-}
-
 async function animateDrawAndStage(card) {
-  // убираем предыдущую закреплённую карту
   clearStage();
   stageEmpty.classList.add("hidden");
   endScreen.style.display = "none";
 
-  // создаём летающую карту
   const { fly, inner, front } = createFlyingCardEl();
 
-  // наполняем лицевую сторону контентом СРАЗУ, чтобы при перевороте он уже был
+  // контент на лицевой стороне уже готов к моменту переворота
   front.innerHTML = "";
   front.appendChild(buildFrontContent(card, nextCard));
 
-  // старт — центр колоды
+  // старт: центр колоды
   const start = getCenterRect(deckStack);
-  // конец — центр сцены справа
-  const end = getCenterRect(cardStage);
 
-  const W = 160, H = 220;
+  // финиш: центр невидимого spot (это “конечная” позиция)
+  const end = getCenterRect(stageSpot);
+
+  const W = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cardW")) || 200;
+  const H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cardH")) || 280;
+
   fly.style.left = (start.x - W/2) + "px";
   fly.style.top  = (start.y - H/2) + "px";
 
-  fly.style.transform = `translate(0px,0px) rotateZ(-6deg) scale(1)`;
+  // без пружин/отскоков — чистая траектория
+  const dx = (end.x - start.x);
+  const dy = (end.y - start.y);
+
+  fly.style.transform = `translate(0px,0px) rotateZ(-5deg)`;
   inner.style.transform = `rotateY(0deg)`;
 
-  const dx = (end.x - start.x) * 0.90;
-  const dy = (end.y - start.y) * 0.10;
-
   const flight = fly.animate([
-    { transform: `translate(0px,0px) rotateZ(-6deg) scale(1)` },
-    { transform: `translate(${dx*0.55}px,${dy*0.30}px) rotateZ(2deg) scale(1.02)` },
-    { transform: `translate(${dx}px,${dy}px) rotateZ(0deg) scale(1.03)` },
+    { transform: `translate(0px,0px) rotateZ(-5deg)` },
+    { transform: `translate(${dx}px,${dy}px) rotateZ(0deg)` },
   ], {
     duration: 520,
-    easing: "cubic-bezier(.2,.9,.2,1)",
+    easing: "cubic-bezier(.25,.9,.25,1)",
     fill: "forwards"
   });
 
@@ -702,48 +720,54 @@ async function animateDrawAndStage(card) {
     { transform: "rotateY(180deg)" },
   ], {
     duration: 520,
-    delay: 110,
+    delay: 70,
     easing: "cubic-bezier(.2,.9,.2,1)",
     fill: "forwards"
   });
 
   await Promise.all([flight.finished, flip.finished]).catch(()=>{});
 
-  // === закрепляем карту в правой панели ===
+  // ===== FLIP: фиксируем карту в stage без “скачка” =====
+  const before = fly.getBoundingClientRect();
+
   const holder = document.createElement("div");
   holder.className = "stage-card";
 
-  // переносим fly-карту со слоя fixed внутрь сцены
+  // переносим fly в stage
   flyLayer.removeChild(fly);
   holder.appendChild(fly);
+  cardStage.insertBefore(holder, stageSpot.nextSibling);
 
-  // сбрасываем absolute positioning и transform
+  // делаем её блочной и растягиваем
   fly.style.position = "relative";
   fly.style.left = "0";
   fly.style.top = "0";
-  fly.style.transform = "none";
-
-  // карточка должна быть перевёрнута (показывает front)
-  inner.style.transform = "rotateY(180deg)";
-
-  // растягиваем по ширине сцены (адаптивно)
   fly.style.width = "100%";
   fly.style.height = "auto";
-  fly.style.minHeight = "320px";
+  fly.style.minHeight = "420px";
+
+  // гарантируем, что показана лицевая сторона
+  inner.style.transform = "rotateY(180deg)";
+
+  const after = fly.getBoundingClientRect();
+  const dx2 = before.left - after.left;
+  const dy2 = before.top - after.top;
+
+  // ставим на место “как было” (чтобы пользователь не заметил перенос)
+  fly.style.transform = `translate(${dx2}px, ${dy2}px)`;
+
+  // затем плавно доводим до нуля (никаких отскоков)
+  fly.animate(
+    [{ transform: `translate(${dx2}px, ${dy2}px)` }, { transform: "translate(0px, 0px)" }],
+    { duration: 180, easing: "cubic-bezier(.2,.8,.2,1)", fill: "forwards" }
+  );
 
   stagedCardEl = holder;
-  cardStage.appendChild(holder);
-}
-
-function updateCardMeta(card) {
-  cardMeta.textContent = `ID: ${card.id || "—"}`;
 }
 
 /* ================= finish game ================= */
 function finishGame(reason) {
   stopTimer();
-
-  // убираем закреплённую карту
   clearStage();
   endScreen.style.display = "block";
 
@@ -775,7 +799,6 @@ async function nextCard() {
   if (endScreen.style.display === "block") return;
 
   const maxToShow = getMaxToShow();
-
   if (!STATE.started) {
     STATE.started = true;
     if (STATE.timer.enabled && STATE.timer.mode === "overall") {
@@ -783,7 +806,6 @@ async function nextCard() {
       startTimer();
     }
   }
-
   if (STATE.shown >= maxToShow) return finishGame("all");
 
   const card = drawRandomCard();
@@ -791,24 +813,18 @@ async function nextCard() {
 
   STATE.busy = true;
 
-  // таймер perCard запускаем заново
+  // таймер perCard — на каждую новую карту
   if (STATE.timer.enabled && STATE.timer.mode === "perCard") {
     STATE.timer.remaining = STATE.timer.totalSeconds;
     startTimer();
   }
 
-  // анимация + закрепление карты справа
   STATE.currentCard = card;
   STATE.shown += 1;
   updateProgressUI();
-  updateCardMeta(card);
+  cardMeta.textContent = `ID: ${card.id || "—"}`;
 
   await animateDrawAndStage(card);
-
-  // критерий завершения (на случай requiredCorrect=0 — по кол-ву)
-  if (STATE.shown >= maxToShow && (CONFIG.settings.requiredCorrect || 0) === 0) {
-    // не заканчиваем мгновенно — пользователь должен нажать “Дальше” или добрать верные
-  }
 
   STATE.busy = false;
 }
