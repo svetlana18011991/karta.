@@ -40,8 +40,10 @@
       background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);
     }
     .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#9b7bff);transition:width .25s ease}
+
     .grid{display:grid;grid-template-columns: 1fr 1.2fr;gap:16px;margin-top:16px}
     @media (max-width: 900px){.grid{grid-template-columns:1fr}}
+
     .card{
       background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
       border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;
@@ -49,23 +51,86 @@
     .card-header{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}
     .card-header .h{font-weight:700}
     .card-body{padding:16px}
-    .deck{
-      display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;
-      padding:20px;min-height:320px;text-align:center;
-      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+
+    /* ===== Колода ===== */
+    .deck-wrap{
+      position:relative;
+      min-height:320px;
+      display:flex;align-items:center;justify-content:center;
       border-radius:var(--radius);
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
       border:1px dashed rgba(255,255,255,.18);
       cursor:pointer; user-select:none;
       transition:transform .08s ease, border-color .15s ease;
+      overflow:hidden;
     }
-    .deck:hover{border-color:rgba(255,255,255,.35)}
-    .deck:active{transform:translateY(1px) scale(.995)}
-    .deck .emoji{font-size:44px}
-    .deck .big{font-weight:800;font-size:18px}
-    .deck .small{color:var(--muted);font-size:13px}
-    .task{
-      display:flex;flex-direction:column;gap:12px;
+    .deck-wrap:hover{border-color:rgba(255,255,255,.35)}
+    .deck-wrap:active{transform:translateY(1px) scale(.995)}
+
+    .deck-stack{
+      position:relative;
+      width:160px;height:220px;
+      filter: drop-shadow(0 18px 22px rgba(0,0,0,.35));
     }
+    .deck-card{
+      position:absolute; inset:0;
+      border-radius:16px;
+      background: var(--back, linear-gradient(135deg,#2b3f8f,#6aa4ff));
+      background-size:cover;
+      background-position:center;
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
+    }
+    .deck-card:nth-child(1){ transform: translate(0px,0px) rotate(-2deg); }
+    .deck-card:nth-child(2){ transform: translate(6px,6px) rotate(1deg); opacity:.96; }
+    .deck-card:nth-child(3){ transform: translate(12px,12px) rotate(3deg); opacity:.92; }
+
+    .deck-labels{
+      margin-top:14px;
+      text-align:center;
+      display:flex;flex-direction:column;gap:6px;
+    }
+    .deck-labels .big{font-weight:800;font-size:16px}
+    .deck-labels .small{color:var(--muted);font-size:13px}
+
+    /* Летающая карта (анимация) */
+    .fly-layer{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:999;
+    }
+    .fly-card{
+      position:absolute;
+      width:160px;height:220px;
+      transform-style:preserve-3d;
+      will-change:transform;
+    }
+    .fly-inner{
+      width:100%;height:100%;
+      position:relative;
+      transform-style:preserve-3d;
+      border-radius:16px;
+      box-shadow: 0 18px 35px rgba(0,0,0,.45);
+    }
+    .fly-face{
+      position:absolute; inset:0;
+      border-radius:16px;
+      backface-visibility:hidden;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.16);
+    }
+    .fly-back{
+      background: var(--back, linear-gradient(135deg,#2b3f8f,#6aa4ff));
+      background-size:cover;
+      background-position:center;
+    }
+    .fly-front{
+      transform: rotateY(180deg);
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    .task{display:flex;flex-direction:column;gap:12px;}
     .prompt{
       padding:12px 12px;border-radius:12px;background:rgba(255,255,255,.05);
       border:1px solid rgba(255,255,255,.10);
@@ -74,6 +139,7 @@
     .prompt .content{font-size:16px;line-height:1.35}
     .prompt img{max-width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.10)}
     audio{width:100%}
+
     .answer{
       padding:12px 12px;border-radius:12px;background:rgba(255,255,255,.05);
       border:1px solid rgba(255,255,255,.10);
@@ -105,10 +171,8 @@
     .feedback.bad{display:block;background:rgba(255,77,77,.12);border-color:rgba(255,77,77,.35);color:var(--bad)}
     .muted{color:var(--muted);font-size:13px;line-height:1.35}
     .hidden{display:none !important}
-    .end{
-      display:none;
-      padding:28px 18px; text-align:center;
-    }
+
+    .end{display:none;padding:28px 18px; text-align:center;}
     .end .boom{font-size:46px}
     .end .h1{font-size:22px;font-weight:900;margin-top:10px}
     .end .p{color:var(--muted);margin-top:8px}
@@ -136,23 +200,31 @@
 
   <div class="grid">
     <!-- Левая панель: колода -->
-    <div class="card">
+    <div class="card" id="leftPanel">
       <div class="card-header">
         <div class="h">Колода</div>
         <button class="btn ghost" id="btnRestart">Сначала</button>
       </div>
       <div class="card-body">
-        <div class="deck" id="deck">
-          <div class="emoji">🂠</div>
-          <div class="big" id="deckText">Открыть карту</div>
-          <div class="small" id="deckHint">Карты не повторяются</div>
+        <div class="deck-wrap" id="deck">
+          <div>
+            <div class="deck-stack" id="deckStack">
+              <div class="deck-card"></div>
+              <div class="deck-card"></div>
+              <div class="deck-card"></div>
+            </div>
+            <div class="deck-labels">
+              <div class="big" id="deckText">Открыть карту</div>
+              <div class="small" id="deckHint">Карты не повторяются</div>
+            </div>
+          </div>
         </div>
         <div class="muted" style="margin-top:12px" id="rulesHint"></div>
       </div>
     </div>
 
     <!-- Правая панель: карта/задание -->
-    <div class="card">
+    <div class="card" id="rightPanel">
       <div class="card-header">
         <div class="h">Карта</div>
         <div class="muted" id="cardMeta">—</div>
@@ -201,43 +273,45 @@
   </div>
 </div>
 
+<!-- слой для анимации -->
+<div class="fly-layer" id="flyLayer"></div>
+
 <script>
-/**
- * CONFIG — будущая точка подключения редактора.
- * Редактор будет изменять этот объект (или подгружать JSON).
- */
 const CONFIG = {
   meta: {
     title: "Случайные карты",
     subtitle: "Нажмите на колоду, чтобы открыть случайную карту",
   },
-  settings: {
-    // Основное:
-    preventRepeats: true,          // Запрет повторов карт
-    maxCardsToShow: 0,             // 0 = показать все карты из массива; иначе ограничить количество открываемых карт
-    requiredCorrect: 0,            // 0 = не использовать; иначе закончить при достижении N верных ответов
 
-    // Проверка и фидбек:
-    enableAutoCheck: true,         // Для текстовых ответов: включить автопроверку
-    caseSensitive: false,          // Сравнение с учетом регистра
-    trimAndNormalize: true,        // Удалять лишние пробелы/нормализовать
+  // UI-параметры (будущий редактор будет менять это)
+  ui: {
+    // Рубашка карты (URL картинки). Пока дефолт — градиент, но можно подставить ссылку.
+    // Пример: "https://.../card-back.png"
+    cardBackUrl: "",
+  },
+
+  settings: {
+    preventRepeats: true,
+    maxCardsToShow: 0,
+    requiredCorrect: 0,
+
+    enableAutoCheck: true,
+    caseSensitive: false,
+    trimAndNormalize: true,
     successText: "Верно",
     errorText: "Попробуй ещё раз",
 
-    // Таймер:
-    timerEnabled: false,           // Показывать таймер
-    timerMode: "perCard",          // "perCard" | "overall"
-    timerSeconds: 30,              // длительность (сек) на карту или на игру
-    onTimeUp: "autoNext",          // "autoNext" | "markWrong" | "endGame"
+    timerEnabled: false,
+    timerMode: "perCard",
+    timerSeconds: 30,
+    onTimeUp: "autoNext",
 
-    // Финал:
     endTitle: "Готово!",
     endTextAll: "Вы прошли все карты.",
     endTextCorrect: (n) => `Вы набрали ${n} верных ответов!`,
-    fanfareUrl: ""                 // URL фанфар (mp3/ogg). Можно оставить пустым.
+    fanfareUrl: ""
   },
 
-  // Карты: тип задания (text/image/audio) + тип ответа (text/oral)
   cards: [
     {
       id: "c1",
@@ -257,24 +331,18 @@ const CONFIG = {
   ]
 };
 
-/* ========= Внутреннее состояние игры ========= */
+/* ========= state ========= */
 const STATE = {
-  deck: [],            // индексы доступных карт
-  shown: 0,            // сколько открыто
-  correct: 0,          // сколько верных (автопроверка)
-  currentCard: null,   // объект карты
+  deck: [],
+  shown: 0,
+  correct: 0,
+  currentCard: null,
   started: false,
-
-  timer: {
-    enabled: false,
-    mode: "perCard",
-    totalSeconds: 0,
-    remaining: 0,
-    intervalId: null
-  }
+  busy: false, // чтобы не спамили кликами во время анимации
+  timer: { enabled:false, mode:"perCard", totalSeconds:0, remaining:0, intervalId:null }
 };
 
-/* ========= UI элементы ========= */
+/* ========= UI ========= */
 const uiTitle = document.getElementById("uiTitle");
 const uiSubtitle = document.getElementById("uiSubtitle");
 const uiCounter = document.getElementById("uiCounter");
@@ -285,17 +353,16 @@ const deckEl = document.getElementById("deck");
 const deckText = document.getElementById("deckText");
 const deckHint = document.getElementById("deckHint");
 const rulesHint = document.getElementById("rulesHint");
+const deckStack = document.getElementById("deckStack");
 
 const taskArea = document.getElementById("taskArea");
 const emptyState = document.getElementById("emptyState");
 const cardMeta = document.getElementById("cardMeta");
 const promptContent = document.getElementById("promptContent");
 
-const answerBlock = document.getElementById("answerBlock");
 const answerLabel = document.getElementById("answerLabel");
 const textAnswer = document.getElementById("textAnswer");
 const oralAnswer = document.getElementById("oralAnswer");
-
 const answerInput = document.getElementById("answerInput");
 const btnCheck = document.getElementById("btnCheck");
 const btnNext = document.getElementById("btnNext");
@@ -311,7 +378,39 @@ const endText = document.getElementById("endText");
 const endStats = document.getElementById("endStats");
 const fanfare = document.getElementById("fanfare");
 
-/* ========= Инициализация ========= */
+const leftPanel = document.getElementById("leftPanel");
+const rightPanel = document.getElementById("rightPanel");
+const flyLayer = document.getElementById("flyLayer");
+
+/* ========= helpers ========= */
+function applyCardBackToDeck() {
+  const url = (CONFIG.ui.cardBackUrl || "").trim();
+  const cards = deckStack.querySelectorAll(".deck-card");
+  cards.forEach(c => {
+    if (url) {
+      c.style.setProperty("--back", `url("${url}")`);
+    } else {
+      c.style.removeProperty("--back");
+    }
+  });
+}
+
+function normalize(s) {
+  if (s == null) return "";
+  let out = String(s);
+  if (CONFIG.settings.trimAndNormalize) out = out.trim().replace(/\s+/g, " ");
+  if (!CONFIG.settings.caseSensitive) out = out.toLowerCase();
+  return out;
+}
+
+function chip(text) {
+  const d = document.createElement("div");
+  d.className = "chip";
+  d.textContent = text;
+  return d;
+}
+
+/* ========= init/reset ========= */
 function initFromConfig() {
   uiTitle.textContent = CONFIG.meta.title || "Случайные карты";
   uiSubtitle.textContent = CONFIG.meta.subtitle || "";
@@ -323,28 +422,64 @@ function initFromConfig() {
 
   deckHint.textContent = CONFIG.settings.preventRepeats ? "Карты не повторяются" : "Повторы разрешены";
 
-  const maxInfo = CONFIG.settings.maxCardsToShow && CONFIG.settings.maxCardsToShow > 0
+  const maxInfo = (CONFIG.settings.maxCardsToShow && CONFIG.settings.maxCardsToShow > 0)
     ? `Откроем ${CONFIG.settings.maxCardsToShow} карт(ы).`
     : `Откроем все карты: ${CONFIG.cards.length}.`;
 
-  const goalInfo = CONFIG.settings.requiredCorrect && CONFIG.settings.requiredCorrect > 0
+  const goalInfo = (CONFIG.settings.requiredCorrect && CONFIG.settings.requiredCorrect > 0)
     ? `Цель: ${CONFIG.settings.requiredCorrect} верных ответов.`
     : "Цели по верным ответам нет.";
 
   rulesHint.textContent = `${maxInfo} ${goalInfo}`;
 
   if (CONFIG.settings.fanfareUrl) fanfare.src = CONFIG.settings.fanfareUrl;
+
+  applyCardBackToDeck();
 }
 
-/* ========= Колода / случайность ========= */
+function stopTimer() {
+  if (STATE.timer.intervalId) clearInterval(STATE.timer.intervalId);
+  STATE.timer.intervalId = null;
+}
+function renderTimer() {
+  const t = Math.max(0, STATE.timer.remaining);
+  const mm = String(Math.floor(t / 60)).padStart(2, "0");
+  const ss = String(t % 60).padStart(2, "0");
+  uiTimer.textContent = `⏱ ${mm}:${ss}`;
+}
+function handleTimeUp() {
+  const mode = CONFIG.settings.onTimeUp || "autoNext";
+  if (mode === "endGame") return finishGame("time");
+  return nextCard(); // autoNext / markWrong — сейчас одинаково
+}
+function startTimer() {
+  stopTimer();
+  if (!STATE.timer.enabled || STATE.timer.totalSeconds <= 0) return;
+  renderTimer();
+  STATE.timer.intervalId = setInterval(() => {
+    STATE.timer.remaining -= 1;
+    renderTimer();
+    if (STATE.timer.remaining <= 0) {
+      stopTimer();
+      handleTimeUp();
+    }
+  }, 1000);
+}
+
+function getMaxToShow() {
+  const m = Number(CONFIG.settings.maxCardsToShow || 0);
+  if (m > 0) return Math.min(m, CONFIG.cards.length);
+  return CONFIG.cards.length;
+}
+
 function resetGame() {
   stopTimer();
-
   STATE.deck = CONFIG.cards.map((_, idx) => idx);
   STATE.shown = 0;
   STATE.correct = 0;
   STATE.currentCard = null;
   STATE.started = false;
+  STATE.busy = false;
 
   taskArea.classList.add("hidden");
   emptyState.classList.remove("hidden");
@@ -367,38 +502,26 @@ function resetGame() {
   }
 }
 
-function getMaxToShow() {
-  const m = Number(CONFIG.settings.maxCardsToShow || 0);
-  if (m > 0) return Math.min(m, CONFIG.cards.length);
-  return CONFIG.cards.length;
-}
-
+/* ========= deck draw ========= */
 function drawRandomCard() {
   const allowRepeats = !CONFIG.settings.preventRepeats;
-
-  if (allowRepeats) {
-    const idx = Math.floor(Math.random() * CONFIG.cards.length);
-    return CONFIG.cards[idx];
-  }
-
+  if (allowRepeats) return CONFIG.cards[Math.floor(Math.random() * CONFIG.cards.length)];
   if (STATE.deck.length === 0) return null;
   const r = Math.floor(Math.random() * STATE.deck.length);
   const idx = STATE.deck.splice(r, 1)[0];
   return CONFIG.cards[idx];
 }
 
-/* ========= Отрисовка карты ========= */
-function renderCard(card) {
+/* ========= render task ========= */
+function renderCardContent(card) {
   STATE.currentCard = card;
 
   emptyState.classList.add("hidden");
   endScreen.style.display = "none";
   taskArea.classList.remove("hidden");
 
-  // meta
   cardMeta.textContent = `ID: ${card.id || "—"}`;
 
-  // prompt
   promptContent.innerHTML = "";
   if (card.prompt.type === "text") {
     promptContent.textContent = card.prompt.value || "";
@@ -416,7 +539,6 @@ function renderCard(card) {
     promptContent.textContent = "Неизвестный тип задания";
   }
 
-  // answer UI
   feedback.className = "feedback";
   feedback.textContent = "";
   btnNext.disabled = true;
@@ -430,41 +552,115 @@ function renderCard(card) {
 
     const canAutoCheck = !!CONFIG.settings.enableAutoCheck;
     btnCheck.style.display = canAutoCheck ? "inline-flex" : "none";
-    btnNext.disabled = canAutoCheck; // если автопроверка — сначала проверка, затем "Дальше"
-    if (!canAutoCheck) btnNext.disabled = false; // без автопроверки — просто дальше
+    btnNext.disabled = canAutoCheck;
+    if (!canAutoCheck) btnNext.disabled = false;
   } else {
     answerLabel.textContent = "Устный ответ";
     textAnswer.classList.add("hidden");
     oralAnswer.classList.remove("hidden");
   }
 
-  // timer per card
   if (STATE.timer.enabled && STATE.timer.mode === "perCard") {
     STATE.timer.remaining = STATE.timer.totalSeconds;
     startTimer();
   }
 }
 
-/* ========= Проверка ответа ========= */
-function normalize(s) {
-  if (s == null) return "";
-  let out = String(s);
-  if (CONFIG.settings.trimAndNormalize) {
-    out = out.trim().replace(/\s+/g, " ");
-  }
-  if (!CONFIG.settings.caseSensitive) {
-    out = out.toLowerCase();
-  }
-  return out;
+/* ========= animation: draw & flip ========= */
+function createFlyingCardEl() {
+  const fly = document.createElement("div");
+  fly.className = "fly-card";
+
+  const inner = document.createElement("div");
+  inner.className = "fly-inner";
+
+  const back = document.createElement("div");
+  back.className = "fly-face fly-back";
+
+  const front = document.createElement("div");
+  front.className = "fly-face fly-front";
+
+  const url = (CONFIG.ui.cardBackUrl || "").trim();
+  if (url) fly.style.setProperty("--back", `url("${url}")`);
+
+  inner.appendChild(back);
+  inner.appendChild(front);
+  fly.appendChild(inner);
+  flyLayer.appendChild(fly);
+
+  return { fly, inner };
 }
 
+function getCenterRect(el) {
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width/2, y: r.top + r.height/2, w: r.width, h: r.height };
+}
+
+async function animateDrawToRightPanel() {
+  // старт — центр колоды
+  const start = getCenterRect(deckStack);
+  // финиш — чуть ниже заголовка правой карточки (центр области)
+  const rightBody = rightPanel.querySelector(".card-body");
+  const end = getCenterRect(rightBody);
+
+  const { fly, inner } = createFlyingCardEl();
+
+  // позиционируем по центру
+  const W = 160, H = 220;
+  fly.style.left = (start.x - W/2) + "px";
+  fly.style.top  = (start.y - H/2) + "px";
+
+  // исходные трансформации
+  fly.style.transform = `translate(0px,0px) rotateZ(-6deg) scale(1)`;
+  inner.style.transform = `rotateY(0deg)`;
+
+  // анимация полёта + лёгкий подъём
+  const dx = (end.x - start.x) * 0.78;   // не до самого центра, чтобы выглядело “вправо”
+  const dy = (end.y - start.y) * 0.30;   // и чуть вниз
+
+  const flight = fly.animate([
+    { transform: `translate(0px,0px) rotateZ(-6deg) scale(1)` },
+    { transform: `translate(${dx*0.55}px,${dy*0.30}px) rotateZ(2deg) scale(1.02)` },
+    { transform: `translate(${dx}px,${dy}px) rotateZ(0deg) scale(1.03)` },
+  ], {
+    duration: 520,
+    easing: "cubic-bezier(.2,.9,.2,1)",
+    fill: "forwards"
+  });
+
+  // переворот начинается чуть позже
+  const flip = inner.animate([
+    { transform: "rotateY(0deg)" },
+    { transform: "rotateY(180deg)" },
+  ], {
+    duration: 520,
+    delay: 110,
+    easing: "cubic-bezier(.2,.9,.2,1)",
+    fill: "forwards"
+  });
+
+  await Promise.all([flight.finished, flip.finished]).catch(()=>{});
+
+  // убрать летающую карту
+  fly.remove();
+}
+
+/* ========= progress ========= */
+function updateProgressUI() {
+  const maxToShow = getMaxToShow();
+  uiCounter.textContent = `${Math.min(STATE.shown, maxToShow)} / ${maxToShow}`;
+  const p = maxToShow > 0 ? (Math.min(STATE.shown, maxToShow) / maxToShow) * 100 : 0;
+  uiBar.style.width = `${p}%`;
+  deckText.textContent = (STATE.shown >= maxToShow) ? "Колода завершена" : (STATE.shown === 0 ? "Открыть карту" : "Следующая карта");
+}
+
+/* ========= check/next/end ========= */
 function checkAnswer() {
   const card = STATE.currentCard;
   if (!card) return;
 
   const user = normalize(answerInput.value);
   const right = normalize(card.answer?.value || "");
-
   const ok = user.length > 0 && user === right;
 
   if (ok) {
@@ -479,111 +675,18 @@ function checkAnswer() {
   }
 
   updateProgressUI();
-  // критерий завершения по правильным
   if (CONFIG.settings.requiredCorrect > 0 && STATE.correct >= CONFIG.settings.requiredCorrect) {
     finishGame("correct");
   }
 }
 
-/* ========= Переход к следующей ========= */
-function nextCard() {
-  const maxToShow = getMaxToShow();
-
-  if (!STATE.started) {
-    STATE.started = true;
-    if (STATE.timer.enabled && STATE.timer.mode === "overall") {
-      startTimer();
-    }
-  }
-
-  // если уже показали достаточно — финал
-  if (STATE.shown >= maxToShow) {
-    finishGame("all");
-    return;
-  }
-
-  const card = drawRandomCard();
-  if (!card) {
-    finishGame("all");
-    return;
-  }
-
-  STATE.shown += 1;
-  updateProgressUI();
-  renderCard(card);
-}
-
-/* ========= Прогресс ========= */
-function updateProgressUI() {
-  const maxToShow = getMaxToShow();
-  uiCounter.textContent = `${Math.min(STATE.shown, maxToShow)} / ${maxToShow}`;
-
-  const p = maxToShow > 0 ? (Math.min(STATE.shown, maxToShow) / maxToShow) * 100 : 0;
-  uiBar.style.width = `${p}%`;
-
-  // надпись на колоде
-  if (STATE.shown >= maxToShow) {
-    deckText.textContent = "Колода завершена";
-  } else {
-    deckText.textContent = STATE.shown === 0 ? "Открыть карту" : "Следующая карта";
-  }
-}
-
-/* ========= Таймер ========= */
-function renderTimer() {
-  const t = Math.max(0, STATE.timer.remaining);
-  const mm = String(Math.floor(t / 60)).padStart(2, "0");
-  const ss = String(t % 60).padStart(2, "0");
-  uiTimer.textContent = `⏱ ${mm}:${ss}`;
-}
-
-function stopTimer() {
-  if (STATE.timer.intervalId) clearInterval(STATE.timer.intervalId);
-  STATE.timer.intervalId = null;
-}
-
-function handleTimeUp() {
-  const mode = CONFIG.settings.onTimeUp || "autoNext";
-
-  if (mode === "endGame") {
-    finishGame("time");
-    return;
-  }
-
-  if (mode === "markWrong") {
-    // просто переходим дальше (для автопроверки это будет "неверно")
-    // можно расширить: считать как ошибку отдельно
-  }
-
-  // autoNext / markWrong:
-  nextCard();
-}
-
-function startTimer() {
-  stopTimer();
-  if (!STATE.timer.enabled || STATE.timer.totalSeconds <= 0) return;
-
-  renderTimer();
-  STATE.timer.intervalId = setInterval(() => {
-    STATE.timer.remaining -= 1;
-    renderTimer();
-    if (STATE.timer.remaining <= 0) {
-      stopTimer();
-      handleTimeUp();
-    }
-  }, 1000);
-}
-
-/* ========= Финал ========= */
 function finishGame(reason) {
   stopTimer();
-
   taskArea.classList.add("hidden");
   emptyState.classList.add("hidden");
   endScreen.style.display = "block";
 
   endTitle.textContent = CONFIG.settings.endTitle || "Готово!";
-
   if (reason === "correct") {
     const n = STATE.correct;
     endText.textContent = typeof CONFIG.settings.endTextCorrect === "function"
@@ -600,25 +703,42 @@ function finishGame(reason) {
   endStats.appendChild(chip(`Верных: ${STATE.correct}`));
   endStats.appendChild(chip(`Повторы: ${CONFIG.settings.preventRepeats ? "нет" : "да"}`));
 
-  // фанфары (если задан URL)
   if (CONFIG.settings.fanfareUrl) {
     try { fanfare.currentTime = 0; fanfare.play().catch(()=>{}); } catch(e){}
   }
 }
 
-function chip(text) {
-  const d = document.createElement("div");
-  d.className = "chip";
-  d.textContent = text;
-  return d;
+async function nextCard() {
+  if (STATE.busy) return;
+  if (endScreen.style.display === "block") return;
+
+  const maxToShow = getMaxToShow();
+  if (!STATE.started) {
+    STATE.started = true;
+    if (STATE.timer.enabled && STATE.timer.mode === "overall") {
+      STATE.timer.remaining = STATE.timer.totalSeconds;
+      startTimer();
+    }
+  }
+  if (STATE.shown >= maxToShow) return finishGame("all");
+
+  const card = drawRandomCard();
+  if (!card) return finishGame("all");
+
+  STATE.busy = true;
+
+  // анимация вытягивания + переворот (рубашка -> лицевая)
+  await animateDrawToRightPanel();
+
+  STATE.shown += 1;
+  updateProgressUI();
+  renderCardContent(card);
+
+  STATE.busy = false;
 }
 
-/* ========= События ========= */
-deckEl.addEventListener("click", () => {
-  // если уже на финале — не мешаем
-  if (endScreen.style.display === "block") return;
-  nextCard();
-});
+/* ========= events ========= */
+deckEl.addEventListener("click", nextCard);
 
 btnCheck.addEventListener("click", checkAnswer);
 answerInput.addEventListener("keydown", (e) => {
@@ -627,14 +747,13 @@ answerInput.addEventListener("keydown", (e) => {
     else nextCard();
   }
 });
-
 btnNext.addEventListener("click", nextCard);
 btnNextOral.addEventListener("click", nextCard);
 
 btnRestart.addEventListener("click", resetGame);
 btnRestart2.addEventListener("click", resetGame);
 
-/* ========= Старт ========= */
+/* ========= старт ========= */
 initFromConfig();
 resetGame();
 </script>
