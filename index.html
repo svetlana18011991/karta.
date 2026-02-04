@@ -55,7 +55,7 @@
     /* ===== Колода ===== */
     .deck-wrap{
       position:relative;
-      min-height:320px;
+      min-height:560px; /* было 320px, увеличили под карту x2 */
       display:flex;align-items:center;justify-content:center;
       border-radius:var(--radius);
       background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
@@ -69,7 +69,7 @@
 
     .deck-stack{
       position:relative;
-      width:160px;height:220px;
+      width:320px;height:440px; /* было 160x220, увеличили x2 */
       filter: drop-shadow(0 18px 22px rgba(0,0,0,.35));
     }
     .deck-card{
@@ -101,7 +101,7 @@
     }
     .fly-card{
       position:absolute;
-      width:160px;height:220px;
+      width:320px;height:440px; /* было 160x220, увеличили x2 */
       transform-style:preserve-3d;
       will-change:transform;
     }
@@ -483,6 +483,7 @@ function resetGame() {
 
   taskArea.classList.add("hidden");
   emptyState.classList.remove("hidden");
+  emptyState.textContent = "Здесь появится карта после клика по колоде.";
   endScreen.style.display = "none";
 
   feedback.className = "feedback";
@@ -599,14 +600,14 @@ function getCenterRect(el) {
 async function animateDrawToRightPanel() {
   // старт — центр колоды
   const start = getCenterRect(deckStack);
-  // финиш — чуть ниже заголовка правой карточки (центр области)
+  // финиш — центр области правой карточки
   const rightBody = rightPanel.querySelector(".card-body");
   const end = getCenterRect(rightBody);
 
   const { fly, inner } = createFlyingCardEl();
 
-  // позиционируем по центру
-  const W = 160, H = 220;
+  // позиционируем по центру (x2)
+  const W = 320, H = 440; // было 160x220
   fly.style.left = (start.x - W/2) + "px";
   fly.style.top  = (start.y - H/2) + "px";
 
@@ -615,8 +616,8 @@ async function animateDrawToRightPanel() {
   inner.style.transform = `rotateY(0deg)`;
 
   // анимация полёта + лёгкий подъём
-  const dx = (end.x - start.x) * 0.78;   // не до самого центра, чтобы выглядело “вправо”
-  const dy = (end.y - start.y) * 0.30;   // и чуть вниз
+  const dx = (end.x - start.x) * 0.78;
+  const dy = (end.y - start.y) * 0.30;
 
   const flight = fly.animate([
     { transform: `translate(0px,0px) rotateZ(-6deg) scale(1)` },
@@ -726,6 +727,19 @@ async function nextCard() {
   if (!card) return finishGame("all");
 
   STATE.busy = true;
+
+  // ✅ СРАЗУ скрываем предыдущий вопрос, чтобы не было наслоения
+  taskArea.classList.add("hidden");
+  endScreen.style.display = "none";
+  emptyState.classList.remove("hidden");
+  emptyState.textContent = "Открываем карту…";
+
+  // чистим контент/фидбек на всякий случай
+  promptContent.innerHTML = "";
+  feedback.className = "feedback";
+  feedback.textContent = "";
+  btnNext.disabled = true;
+  answerInput.value = "";
 
   // анимация вытягивания + переворот (рубашка -> лицевая)
   await animateDrawToRightPanel();
