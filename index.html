@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Случайные карты — богаче (блум/глянец/shine)</title>
+  <title>Вытяни карту</title>
   <style>
     :root{
-      --bg:#070b1a;
+      --bg:#050816;
       --text:#eaf0ff;
       --muted:#a9b6e6;
 
@@ -20,11 +20,10 @@
       --radius: 18px;
       --radius2: 22px;
 
-      /* размеры карты x2 */
-      --cardW: 320px;
-      --cardH: 440px;
+      /* карты чуть-чуть больше */
+      --cardW: 350px;
+      --cardH: 480px;
 
-      --panel: rgba(255,255,255,.05);
       --border: rgba(255,255,255,.10);
       --border2: rgba(255,255,255,.14);
 
@@ -36,52 +35,56 @@
     html,body{height:100%}
     body{
       margin:0;color:var(--text);
-      background:
-        radial-gradient(1200px 700px at 10% 15%, rgba(106,164,255,.18) 0%, rgba(7,11,26,0) 55%),
-        radial-gradient(900px 600px at 85% 20%, rgba(155,123,255,.14) 0%, rgba(7,11,26,0) 60%),
-        radial-gradient(900px 700px at 55% 110%, rgba(45,210,125,.10) 0%, rgba(7,11,26,0) 55%),
-        var(--bg);
       overflow-x:hidden;
+
+      /* ✅ Новый фон: “северное сияние + туман” */
+      background:
+        radial-gradient(1100px 700px at 12% 18%, rgba(106,164,255,.20) 0%, rgba(5,8,22,0) 58%),
+        radial-gradient(900px 640px at 88% 16%, rgba(155,123,255,.16) 0%, rgba(5,8,22,0) 62%),
+        radial-gradient(1000px 780px at 55% 112%, rgba(45,210,125,.14) 0%, rgba(5,8,22,0) 58%),
+        radial-gradient(900px 600px at 50% 55%, rgba(255,255,255,.06) 0%, rgba(5,8,22,0) 55%),
+        linear-gradient(180deg, rgba(10,14,40,.65), rgba(5,8,22,1));
+      position:relative;
     }
 
-    /* звездная пыль */
+    /* “звёздная пыль” */
     body::before{
       content:"";
       position:fixed; inset:0;
       pointer-events:none;
       background-image:
-        radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.25) 50%, rgba(255,255,255,0) 60%),
-        radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,.18) 50%, rgba(255,255,255,0) 60%),
-        radial-gradient(1px 1px at 60% 30%, rgba(255,255,255,.20) 50%, rgba(255,255,255,0) 60%),
-        radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,.15) 50%, rgba(255,255,255,0) 60%),
+        radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.22) 50%, rgba(255,255,255,0) 60%),
+        radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,.16) 50%, rgba(255,255,255,0) 60%),
+        radial-gradient(1px 1px at 60% 30%, rgba(255,255,255,.18) 50%, rgba(255,255,255,0) 60%),
+        radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,.14) 50%, rgba(255,255,255,0) 60%),
         radial-gradient(1px 1px at 50% 55%, rgba(255,255,255,.12) 50%, rgba(255,255,255,0) 60%);
       opacity:.55;
       animation: twinkle 4.5s ease-in-out infinite;
       filter: blur(.2px);
       z-index:0;
     }
-    @keyframes twinkle{0%,100%{opacity:.45}50%{opacity:.7}}
+    @keyframes twinkle{0%,100%{opacity:.45}50%{opacity:.72}}
 
-    /* блобы */
+    /* “туман/световые блобы” */
     .blob{
-      position:fixed; width:540px;height:540px;border-radius:50%;
-      filter: blur(46px);
-      opacity:.22;
+      position:fixed; width:620px;height:620px;border-radius:50%;
+      filter: blur(55px);
+      opacity:.20;
       pointer-events:none;
       mix-blend-mode:screen;
       z-index:0;
-      animation: floaty 12s ease-in-out infinite;
+      animation: floaty 13s ease-in-out infinite;
     }
-    .blob.b1{left:-180px;top:-130px;background:radial-gradient(circle at 30% 30%, rgba(106,164,255,.9), rgba(106,164,255,0) 60%); animation-duration:13s}
-    .blob.b2{right:-220px;top:-90px;background:radial-gradient(circle at 30% 30%, rgba(155,123,255,.9), rgba(155,123,255,0) 60%); animation-duration:15s}
-    .blob.b3{left:12%;bottom:-280px;background:radial-gradient(circle at 30% 30%, rgba(45,210,125,.9), rgba(45,210,125,0) 60%); animation-duration:17s}
+    .blob.b1{left:-210px;top:-150px;background:radial-gradient(circle at 30% 30%, rgba(106,164,255,.95), rgba(106,164,255,0) 60%); animation-duration:14s}
+    .blob.b2{right:-250px;top:-120px;background:radial-gradient(circle at 30% 30%, rgba(155,123,255,.95), rgba(155,123,255,0) 60%); animation-duration:16s}
+    .blob.b3{left:10%;bottom:-340px;background:radial-gradient(circle at 30% 30%, rgba(45,210,125,.95), rgba(45,210,125,0) 60%); animation-duration:18s}
     @keyframes floaty{
       0%{transform:translate(0,0) scale(1)}
-      50%{transform:translate(20px,-18px) scale(1.05)}
+      50%{transform:translate(24px,-20px) scale(1.06)}
       100%{transform:translate(0,0) scale(1)}
     }
 
-    .wrap{max-width:1080px;margin:0 auto;padding:18px; position:relative; z-index:1;}
+    .wrap{max-width:1120px;margin:0 auto;padding:18px; position:relative; z-index:1;}
     .topbar{
       display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;
       padding:14px 16px;
@@ -92,7 +95,7 @@
       backdrop-filter: blur(10px);
     }
     .left{display:flex;flex-direction:column;gap:6px}
-    .title{font-weight:900;font-size:16px;letter-spacing:.2px}
+    .title{font-weight:950;font-size:18px;letter-spacing:.2px}
     .subtitle{color:var(--muted);font-size:12.5px}
 
     .right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
@@ -134,8 +137,7 @@
       display:inline-flex;align-items:center;gap:6px;
       backdrop-filter: blur(10px);
     }
-    .chip .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18);box-shadow:0 0 0 3px rgba(255,255,255,.06)}
-    .chip.fire .dot{background:rgba(255,180,60,.95);box-shadow:0 0 0 3px rgba(255,180,60,.18)}
+    .chip .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,180,60,.95);box-shadow:0 0 0 3px rgba(255,180,60,.18)}
 
     .grid{display:grid;grid-template-columns: 1fr 1.25fr;gap:16px;margin-top:16px}
     @media (max-width: 960px){.grid{grid-template-columns:1fr}}
@@ -151,24 +153,24 @@
     }
     #rightPanel{
       border-color: rgba(255,255,255,.14);
-      box-shadow: 0 20px 70px rgba(0,0,0,.48);
+      box-shadow: 0 20px 72px rgba(0,0,0,.50);
     }
     .panel-header{
       padding:14px 16px;
       border-bottom:1px solid rgba(255,255,255,.10);
       display:flex;justify-content:space-between;align-items:center;gap:10px;
     }
-    .panel-header .h{font-weight:900;letter-spacing:.2px}
+    .panel-header .h{font-weight:950;letter-spacing:.2px}
     .panel-body{padding:16px}
 
     /* ===== Колода ===== */
     .deck-wrap{
       position:relative;
-      min-height:560px;
+      min-height:610px;
       display:flex;align-items:center;justify-content:center;
       border-radius:var(--radius2);
       background:
-        radial-gradient(800px 520px at 50% 40%, rgba(106,164,255,.10), rgba(0,0,0,0) 60%),
+        radial-gradient(900px 580px at 50% 40%, rgba(106,164,255,.10), rgba(0,0,0,0) 60%),
         linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border:1px dashed rgba(255,255,255,.20);
       cursor:pointer; user-select:none;
@@ -176,10 +178,10 @@
       overflow:hidden;
     }
     .deck-wrap:hover{
-      border-color:rgba(255,255,255,.40);
+      border-color:rgba(255,255,255,.42);
       box-shadow:
         0 0 0 6px rgba(106,164,255,.10),
-        0 0 34px rgba(155,123,255,.10),
+        0 0 40px rgba(155,123,255,.12),
         0 0 0 1px rgba(255,255,255,.06) inset;
     }
     .deck-wrap:active{transform:translateY(1px) scale(.995)}
@@ -187,7 +189,7 @@
     .deck-stack{
       position:relative;
       width:var(--cardW);height:var(--cardH);
-      filter: drop-shadow(0 22px 28px rgba(0,0,0,.45));
+      filter: drop-shadow(0 24px 32px rgba(0,0,0,.46));
     }
     .deck-card{
       position:absolute; inset:0;
@@ -197,17 +199,16 @@
       background-position:center;
       border:1px solid rgba(255,255,255,.16);
       box-shadow:
-        0 16px 44px rgba(0,0,0,.42),
-        0 0 40px rgba(106,164,255,.08);
+        0 18px 48px rgba(0,0,0,.44),
+        0 0 44px rgba(106,164,255,.09);
       overflow:hidden;
     }
-    /* глянец + shine на рубашке */
     .deck-card::before{
       content:"";
       position:absolute; inset:0;
       background:
-        radial-gradient(500px 320px at 25% 20%, rgba(255,255,255,.18), rgba(255,255,255,0) 60%),
-        radial-gradient(420px 320px at 85% 30%, rgba(155,123,255,.20), rgba(155,123,255,0) 60%);
+        radial-gradient(560px 360px at 25% 20%, rgba(255,255,255,.18), rgba(255,255,255,0) 60%),
+        radial-gradient(480px 360px at 85% 30%, rgba(155,123,255,.20), rgba(155,123,255,0) 60%);
       opacity:.50;
       mix-blend-mode:screen;
       pointer-events:none;
@@ -235,9 +236,9 @@
     .deck-labels .big{font-weight:950;font-size:16px}
     .deck-labels .small{color:var(--muted);font-size:13px}
 
-    /* ===== Сцена справа: карточка-оборотень ===== */
+    /* ===== Сцена справа: “карта с вопросом” ===== */
     .stage{
-      min-height: 560px;
+      min-height: 610px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -250,9 +251,9 @@
       transform-style:preserve-3d;
       will-change:transform;
       filter:
-        drop-shadow(0 24px 55px rgba(0,0,0,.55))
-        drop-shadow(0 0 26px rgba(106,164,255,.16))
-        drop-shadow(0 0 36px rgba(155,123,255,.10));
+        drop-shadow(0 26px 62px rgba(0,0,0,.60))
+        drop-shadow(0 0 30px rgba(106,164,255,.18))
+        drop-shadow(0 0 44px rgba(155,123,255,.12));
     }
 
     .display-inner{
@@ -279,22 +280,22 @@
     .front{
       transform: rotateY(180deg);
       background:
-        radial-gradient(900px 500px at 20% 20%, rgba(106,164,255,.18), rgba(0,0,0,0) 60%),
-        radial-gradient(700px 520px at 90% 30%, rgba(155,123,255,.16), rgba(0,0,0,0) 60%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+        radial-gradient(980px 560px at 20% 20%, rgba(106,164,255,.20), rgba(0,0,0,0) 60%),
+        radial-gradient(820px 600px at 90% 30%, rgba(155,123,255,.18), rgba(0,0,0,0) 60%),
+        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
     }
 
-    /* “блум” и глянец на фронте */
     .front::before{
       content:"";
       position:absolute; inset:0;
       background:
-        radial-gradient(520px 360px at 22% 20%, rgba(255,255,255,.20), rgba(255,255,255,0) 60%),
-        radial-gradient(520px 360px at 85% 30%, rgba(155,123,255,.16), rgba(155,123,255,0) 62%);
+        radial-gradient(600px 400px at 22% 20%, rgba(255,255,255,.22), rgba(255,255,255,0) 60%),
+        radial-gradient(600px 400px at 85% 30%, rgba(155,123,255,.18), rgba(155,123,255,0) 62%);
       opacity:.55;
       mix-blend-mode:screen;
       pointer-events:none;
     }
+
     .front::after{
       content:"";
       position:absolute; inset:-35%;
@@ -309,11 +310,10 @@
     }
     @keyframes frontShine{
       0%{opacity:0; transform:translateX(-60%) rotate(10deg)}
-      20%{opacity:.55}
+      20%{opacity:.60}
       100%{opacity:0; transform:translateX(60%) rotate(10deg)}
     }
 
-    /* рамка */
     .frame{
       position:absolute; inset:10px;
       border-radius:16px;
@@ -323,7 +323,6 @@
       z-index:2;
     }
 
-    /* контент на фронте */
     .front-content{
       position:absolute; inset:0;
       padding:14px;
@@ -332,6 +331,7 @@
       gap:10px;
       z-index:3;
     }
+
     .front-top{
       display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;
     }
@@ -346,7 +346,7 @@
     }
     .badge.type{border-color:rgba(106,164,255,.28); background:rgba(106,164,255,.12)}
     .badge.id{opacity:.95}
-    .badge.streak{border-color:rgba(255,180,60,.30); background:rgba(255,180,60,.10)}
+    .badge.score{border-color:rgba(255,180,60,.30); background:rgba(255,180,60,.10)}
     .badge.meta{border-color:rgba(255,255,255,.12); background:rgba(255,255,255,.06)}
     .badge strong{font-weight:900}
 
@@ -400,7 +400,7 @@
       background:rgba(255,255,255,.06);
       color:var(--text);
       cursor:pointer;
-      font-weight:900;
+      font-weight:950;
       font-size:14px;
       transition:transform .08s ease, background .15s ease, border-color .15s ease, box-shadow .2s ease;
       display:inline-flex; align-items:center; gap:8px;
@@ -452,9 +452,9 @@
       transform-style:preserve-3d;
       will-change:transform;
       filter:
-        drop-shadow(0 24px 55px rgba(0,0,0,.55))
-        drop-shadow(0 0 26px rgba(106,164,255,.16))
-        drop-shadow(0 0 36px rgba(155,123,255,.10));
+        drop-shadow(0 26px 62px rgba(0,0,0,.60))
+        drop-shadow(0 0 30px rgba(106,164,255,.18))
+        drop-shadow(0 0 44px rgba(155,123,255,.12));
     }
     .fly-inner{
       width:100%;height:100%;
@@ -479,16 +479,16 @@
     .fly-front{
       transform: rotateY(180deg);
       background:
-        radial-gradient(900px 500px at 20% 20%, rgba(106,164,255,.18), rgba(0,0,0,0) 60%),
-        radial-gradient(700px 520px at 90% 30%, rgba(155,123,255,.16), rgba(0,0,0,0) 60%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+        radial-gradient(980px 560px at 20% 20%, rgba(106,164,255,.20), rgba(0,0,0,0) 60%),
+        radial-gradient(820px 600px at 90% 30%, rgba(155,123,255,.18), rgba(0,0,0,0) 60%),
+        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
     }
     .fly-front::before{
       content:"";
       position:absolute; inset:0;
       background:
-        radial-gradient(520px 360px at 22% 20%, rgba(255,255,255,.20), rgba(255,255,255,0) 60%),
-        radial-gradient(520px 360px at 85% 30%, rgba(155,123,255,.16), rgba(155,123,255,0) 62%);
+        radial-gradient(600px 400px at 22% 20%, rgba(255,255,255,.22), rgba(255,255,255,0) 60%),
+        radial-gradient(600px 400px at 85% 30%, rgba(155,123,255,.18), rgba(155,123,255,0) 62%);
       opacity:.55;
       mix-blend-mode:screen;
       pointer-events:none;
@@ -502,9 +502,7 @@
       pointer-events:none;
       mix-blend-mode:screen;
     }
-    .fly-card.shine .fly-front::after{
-      animation: frontShine 900ms ease-out;
-    }
+    .fly-card.shine .fly-front::after{ animation: frontShine 900ms ease-out; }
 
     /* финал */
     .end{display:none;padding:22px 16px; text-align:center;}
@@ -523,17 +521,18 @@
   <div class="wrap">
     <div class="topbar">
       <div class="left">
-        <div class="title" id="uiTitle">Случайные карты</div>
-        <div class="subtitle" id="uiSubtitle">Нажмите на колоду, чтобы открыть случайную карту</div>
+        <div class="title" id="uiTitle">Вытяни карту</div>
+        <div class="subtitle" id="uiSubtitle">Нажмите на колоду, чтобы вытянуть случайную карту</div>
       </div>
 
       <div class="right">
         <div class="mini" id="uiStepText">Карта 0 из 0</div>
         <div class="counter" id="uiCounter">0 / 0</div>
 
-        <div class="chip fire" title="Серия правильных ответов">
+        <!-- ✅ без слова “Серия” -->
+        <div class="chip" title="Текущая цепочка правильных ответов">
           <span class="dot"></span>
-          <span>🔥 Серия: <b id="uiStreakNum">0</b></span>
+          <span>🔥 <b id="uiStreakNum">0</b></span>
         </div>
 
         <div class="progress" aria-label="Прогресс">
@@ -559,7 +558,7 @@
                 <div class="deck-card"></div>
               </div>
               <div class="deck-labels">
-                <div class="big" id="deckText">Открыть карту</div>
+                <div class="big" id="deckText">Вытянуть карту</div>
                 <div class="small" id="deckHint">Карты не повторяются</div>
               </div>
             </div>
@@ -577,19 +576,22 @@
 
         <div class="panel-body">
           <div class="stage">
-            <!-- ОДНА “карта” справа: вопрос/ввод прямо на фронте -->
+
+            <!-- Карта справа с вопросом прямо на фронте -->
             <div class="display-card hidden" id="displayCard">
               <div class="display-inner" id="displayInner">
-                <div class="face back" id="displayBack"></div>
+                <div class="face back"></div>
 
-                <div class="face front" id="displayFront">
+                <div class="face front">
                   <div class="frame"></div>
                   <div class="front-content">
                     <div class="front-top">
                       <div style="display:flex;gap:8px;flex-wrap:wrap">
                         <span class="badge type" id="badgeType"><strong>Тип</strong>: —</span>
                         <span class="badge id" id="badgeId">ID: —</span>
-                        <span class="badge streak" id="badgeStreak">🔥 Серия: <b id="badgeStreakNum">0</b></span>
+
+                        <!-- ✅ без слова “Серия” -->
+                        <span class="badge score">🔥 <b id="badgeStreakNum">0</b></span>
                       </div>
                       <span class="badge meta" id="badgeMeta">—</span>
                     </div>
@@ -599,7 +601,7 @@
                       <div class="content" id="promptContent"></div>
                     </div>
 
-                    <div class="block" id="answerBlock">
+                    <div class="block">
                       <div class="label" id="answerLabel">Ответ</div>
 
                       <div id="textAnswer" class="row hidden">
@@ -641,23 +643,27 @@
     </div>
   </div>
 
-  <!-- слой для полёта -->
   <div class="fly-layer" id="flyLayer"></div>
 
 <script>
 const CONFIG = {
-  meta: { title: "Случайные карты", subtitle: "Нажмите на колоду, чтобы открыть случайную карту" },
+  meta: {
+    title: "Вытяни карту",
+    subtitle: "Нажмите на колоду, чтобы вытянуть случайную карту"
+  },
   ui: { cardBackUrl: "" },
 
   settings: {
     preventRepeats: true,
     maxCardsToShow: 0,
     requiredCorrect: 0,
+
     enableAutoCheck: true,
     caseSensitive: false,
     trimAndNormalize: true,
     successText: "Верно! Отлично 👍",
     errorText: "Почти. Попробуй ещё раз 🙂",
+
     endTitle: "Готово!",
     endTextAll: "Вы прошли все карты.",
     endTextCorrect: (n) => `Вы набрали ${n} верных ответов!`,
@@ -675,7 +681,6 @@ const STATE = {
   shown: 0,
   correct: 0,
   currentCard: null,
-  started: false,
   busy: false,
   streak: 0,
   bestStreak: 0
@@ -701,7 +706,6 @@ const cardMeta = document.getElementById("cardMeta");
 
 const displayCard = document.getElementById("displayCard");
 const displayInner = document.getElementById("displayInner");
-const displayBack = document.getElementById("displayBack");
 
 const emptyState = document.getElementById("emptyState");
 const endScreen = document.getElementById("endScreen");
@@ -726,25 +730,19 @@ const feedback = document.getElementById("feedback");
 
 const btnRestart = document.getElementById("btnRestart");
 const btnRestart2 = document.getElementById("btnRestart2");
-
 const flyLayer = document.getElementById("flyLayer");
 
 /* helpers */
 function applyCardBack() {
   const url = (CONFIG.ui.cardBackUrl || "").trim();
 
-  // колода
   deckStack.querySelectorAll(".deck-card").forEach(c => {
     if (url) c.style.setProperty("--back", `url("${url}")`);
     else c.style.removeProperty("--back");
   });
 
-  // карта справа (back face)
-  if (url) {
-    displayCard.style.setProperty("--back", `url("${url}")`);
-  } else {
-    displayCard.style.removeProperty("--back");
-  }
+  if (url) displayCard.style.setProperty("--back", `url("${url}")`);
+  else displayCard.style.removeProperty("--back");
 }
 
 function normalize(s){
@@ -754,7 +752,6 @@ function normalize(s){
   if (!CONFIG.settings.caseSensitive) out = out.toLowerCase();
   return out;
 }
-
 function typeLabel(t){
   if (t==="text") return "Текст";
   if (t==="image") return "Картинка";
@@ -778,11 +775,6 @@ function renderDots(){
   }
 }
 
-function updateStreakUI(){
-  uiStreakNum.textContent = String(STATE.streak);
-  badgeStreakNum.textContent = String(STATE.streak);
-}
-
 function updateProgressUI(){
   const maxToShow = getMaxToShow();
   const shown = Math.min(STATE.shown, maxToShow);
@@ -793,14 +785,18 @@ function updateProgressUI(){
   const p = maxToShow > 0 ? (shown / maxToShow) * 100 : 0;
   uiBar.style.width = `${p}%`;
 
-  const dots = uiDots.querySelectorAll(".d");
-  dots.forEach((d,i)=>{
+  uiDots.querySelectorAll(".d").forEach((d,i)=>{
     d.classList.remove("done","current");
     if (i < shown) d.classList.add("done");
     if (i === shown && shown < maxToShow) d.classList.add("current");
   });
 
-  deckText.textContent = (STATE.shown >= maxToShow) ? "Колода завершена" : (STATE.shown===0 ? "Открыть карту" : "Следующая карта");
+  deckText.textContent = (STATE.shown >= maxToShow) ? "Колода завершена" : (STATE.shown===0 ? "Вытянуть карту" : "Следующая карта");
+}
+
+function updateScoreUI(){
+  uiStreakNum.textContent = String(STATE.streak);
+  badgeStreakNum.textContent = String(STATE.streak);
 }
 
 function resetAnswerUI(){
@@ -812,7 +808,7 @@ function resetAnswerUI(){
   answerInput.classList.remove("ok","bad");
 }
 
-function resetRightStateToEmpty(){
+function resetRightToEmpty(){
   displayCard.classList.add("hidden");
   emptyState.classList.remove("hidden");
   endScreen.style.display = "none";
@@ -824,29 +820,32 @@ function resetGame(){
   STATE.shown = 0;
   STATE.correct = 0;
   STATE.currentCard = null;
-  STATE.started = false;
   STATE.busy = false;
   STATE.streak = 0;
   STATE.bestStreak = 0;
 
-  resetAnswerUI();
-  updateStreakUI();
-  renderDots();
-  updateProgressUI();
-
-  resetRightStateToEmpty();
-  emptyState.textContent = "Здесь появится карта после клика по колоде.";
+  uiTitle.textContent = CONFIG.meta.title || "Вытяни карту";
+  uiSubtitle.textContent = CONFIG.meta.subtitle || "";
 
   deckHint.textContent = CONFIG.settings.preventRepeats ? "Карты не повторяются" : "Повторы разрешены";
+
   const maxInfo = (CONFIG.settings.maxCardsToShow && CONFIG.settings.maxCardsToShow > 0)
     ? `Откроем ${CONFIG.settings.maxCardsToShow} карт(ы).`
     : `Откроем все карты: ${CONFIG.cards.length}.`;
+
   const goalInfo = (CONFIG.settings.requiredCorrect && CONFIG.settings.requiredCorrect > 0)
     ? `Цель: ${CONFIG.settings.requiredCorrect} верных ответов.`
     : "Цели по верным ответам нет.";
+
   rulesHint.textContent = `${maxInfo} ${goalInfo}`;
 
-  deckText.textContent = "Открыть карту";
+  resetAnswerUI();
+  updateScoreUI();
+  renderDots();
+  updateProgressUI();
+
+  resetRightToEmpty();
+  emptyState.textContent = "Здесь появится карта после клика по колоде.";
 }
 
 function drawRandomCard(){
@@ -858,7 +857,6 @@ function drawRandomCard(){
   return CONFIG.cards[idx];
 }
 
-/* render front content on the card itself */
 function renderCardOnFront(card){
   STATE.currentCard = card;
 
@@ -888,7 +886,7 @@ function renderCardOnFront(card){
   }
 
   resetAnswerUI();
-  updateStreakUI();
+  updateScoreUI();
 
   if (aType === "text"){
     answerLabel.textContent = "Введите ответ";
@@ -904,16 +902,15 @@ function renderCardOnFront(card){
     oralAnswer.classList.remove("hidden");
   }
 
-  // shine на фронте
   displayCard.classList.remove("shine");
   void displayCard.offsetWidth;
   displayCard.classList.add("shine");
 }
 
-/* animation */
+/* animation helpers */
 function getCenterRect(el){
   const r = el.getBoundingClientRect();
-  return { x: r.left + r.width/2, y: r.top + r.height/2, w:r.width, h:r.height };
+  return { x: r.left + r.width/2, y: r.top + r.height/2 };
 }
 
 function createFlyingCardEl(){
@@ -937,6 +934,10 @@ function createFlyingCardEl(){
   fly.appendChild(inner);
   flyLayer.appendChild(fly);
 
+  fly.classList.remove("shine");
+  void fly.offsetWidth;
+  fly.classList.add("shine");
+
   return { fly, inner };
 }
 
@@ -947,8 +948,8 @@ async function animateDrawToRightPanel(){
 
   const { fly, inner } = createFlyingCardEl();
 
-  const W = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cardW")) || 320;
-  const H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cardH")) || 440;
+  const W = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cardW")) || 350;
+  const H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cardH")) || 480;
 
   fly.style.left = (start.x - W/2) + "px";
   fly.style.top  = (start.y - H/2) + "px";
@@ -958,11 +959,6 @@ async function animateDrawToRightPanel(){
 
   const dx = (end.x - start.x) * 0.78;
   const dy = (end.y - start.y) * 0.30;
-
-  // shine на полете
-  fly.classList.remove("shine");
-  void fly.offsetWidth;
-  fly.classList.add("shine");
 
   const flight = fly.animate([
     { transform: `translate(0px,0px) rotateZ(-7deg) scale(1)` },
@@ -979,7 +975,7 @@ async function animateDrawToRightPanel(){
   fly.remove();
 }
 
-/* check/next/end */
+/* logic */
 function checkAnswer(){
   const card = STATE.currentCard;
   if (!card) return;
@@ -997,7 +993,7 @@ function checkAnswer(){
 
     STATE.streak += 1;
     STATE.bestStreak = Math.max(STATE.bestStreak, STATE.streak);
-    updateStreakUI();
+    updateScoreUI();
 
     btnNext.disabled = false;
     btnNext.classList.add("pulse");
@@ -1009,7 +1005,7 @@ function checkAnswer(){
     btnNext.classList.remove("pulse");
 
     STATE.streak = 0;
-    updateStreakUI();
+    updateScoreUI();
 
     answerInput.classList.add("bad");
   }
@@ -1019,8 +1015,14 @@ function checkAnswer(){
   }
 }
 
+function statChip(text){
+  const d = document.createElement("div");
+  d.className = "chip";
+  d.innerHTML = `<span class="dot"></span><span>${text}</span>`;
+  return d;
+}
+
 function finishGame(reason){
-  // скрываем карту
   displayCard.classList.add("hidden");
   emptyState.classList.add("hidden");
   endScreen.style.display = "block";
@@ -1038,17 +1040,10 @@ function finishGame(reason){
   endStats.innerHTML = "";
   endStats.appendChild(statChip(`Открыто: ${STATE.shown}/${getMaxToShow()}`));
   endStats.appendChild(statChip(`Верных: ${STATE.correct}`));
-  endStats.appendChild(statChip(`🔥 Лучшая серия: ${STATE.bestStreak}`));
+  endStats.appendChild(statChip(`🔥 Лучшее: ${STATE.bestStreak}`));
   endStats.appendChild(statChip(`Повторы: ${CONFIG.settings.preventRepeats ? "нет" : "да"}`));
 
   cardMeta.textContent = "—";
-}
-
-function statChip(text){
-  const d = document.createElement("div");
-  d.className = "chip";
-  d.innerHTML = `<span class="dot"></span><span>${text}</span>`;
-  return d;
 }
 
 /* параллакс на карте справа */
@@ -1086,21 +1081,19 @@ async function nextCard(){
 
   STATE.busy = true;
 
-  // ✅ сразу убираем предыдущее (без наслоения)
+  // убрать предыдущее (без наслоений)
   endScreen.style.display = "none";
   emptyState.classList.add("hidden");
   displayCard.classList.add("hidden");
   resetAnswerUI();
   promptContent.innerHTML = "";
 
-  // полет + переворот
   await animateDrawToRightPanel();
 
-  // показать карту справа уже “перевернутой” (фронт)
+  // показать карту справа перевернутой (фронт)
   displayCard.classList.remove("hidden");
   displayInner.style.transform = "rotateY(180deg)";
 
-  // контент прямо на фронте
   STATE.shown += 1;
   updateProgressUI();
   renderCardOnFront(card);
@@ -1108,21 +1101,9 @@ async function nextCard(){
   STATE.busy = false;
 }
 
-/* init */
-function init(){
-  uiTitle.textContent = CONFIG.meta.title || "Случайные карты";
-  uiSubtitle.textContent = CONFIG.meta.subtitle || "";
-
-  applyCardBack();
-  renderDots();
-  updateProgressUI();
-  updateStreakUI();
-  resetRightStateToEmpty();
-  resetGame();
-}
-
-/* events */
+/* events + init */
 deckEl.addEventListener("click", nextCard);
+
 btnCheck.addEventListener("click", checkAnswer);
 answerInput.addEventListener("keydown", (e)=>{
   if (e.key === "Enter"){
@@ -1136,7 +1117,8 @@ btnNextOral.addEventListener("click", nextCard);
 btnRestart.addEventListener("click", resetGame);
 btnRestart2.addEventListener("click", resetGame);
 
-init();
+applyCardBack();
+resetGame();
 </script>
 </body>
 </html>
