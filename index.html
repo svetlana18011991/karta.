@@ -20,14 +20,11 @@
       --radius: 18px;
       --radius2: 22px;
 
-      /* карты чуть-чуть больше */
-      --cardW: 350px;
-      --cardH: 480px;
+      /* ✅ вернули предыдущий размер (как было до “чуть-чуть увеличим”) */
+      --cardW: 320px;
+      --cardH: 440px;
 
       --border: rgba(255,255,255,.10);
-      --border2: rgba(255,255,255,.14);
-
-      --shadow: 0 18px 55px rgba(0,0,0,.42);
       --shadow2: 0 10px 28px rgba(0,0,0,.35);
     }
 
@@ -37,7 +34,7 @@
       margin:0;color:var(--text);
       overflow-x:hidden;
 
-      /* ✅ Новый фон: “северное сияние + туман” */
+      /* Фон: северное сияние + мягкий туман */
       background:
         radial-gradient(1100px 700px at 12% 18%, rgba(106,164,255,.20) 0%, rgba(5,8,22,0) 58%),
         radial-gradient(900px 640px at 88% 16%, rgba(155,123,255,.16) 0%, rgba(5,8,22,0) 62%),
@@ -47,7 +44,6 @@
       position:relative;
     }
 
-    /* “звёздная пыль” */
     body::before{
       content:"";
       position:fixed; inset:0;
@@ -65,7 +61,6 @@
     }
     @keyframes twinkle{0%,100%{opacity:.45}50%{opacity:.72}}
 
-    /* “туман/световые блобы” */
     .blob{
       position:fixed; width:620px;height:620px;border-radius:50%;
       filter: blur(55px);
@@ -89,7 +84,7 @@
       display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;
       padding:14px 16px;
       background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
-      border:1px solid var(--border);
+      border:1px solid rgba(255,255,255,.10);
       border-radius:var(--radius2);
       box-shadow:var(--shadow2);
       backdrop-filter: blur(10px);
@@ -99,8 +94,8 @@
     .subtitle{color:var(--muted);font-size:12.5px}
 
     .right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .mini{font-size:13px;color:var(--muted)}
     .counter{font-size:13px;color:var(--muted)}
+
     .progress{
       width:220px;height:10px;border-radius:999px;overflow:hidden;
       background:rgba(255,255,255,.08);
@@ -111,6 +106,7 @@
       background:linear-gradient(90deg,var(--accent),var(--accent2));
       transition:width .25s ease;
     }
+
     .dots{display:flex;gap:6px;align-items:center}
     .dots .d{
       width:8px;height:8px;border-radius:999px;
@@ -144,7 +140,7 @@
 
     .panel{
       background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
-      border:1px solid var(--border);
+      border:1px solid rgba(255,255,255,.10);
       border-radius:var(--radius2);
       box-shadow:var(--shadow2);
       overflow:hidden;
@@ -166,7 +162,7 @@
     /* ===== Колода ===== */
     .deck-wrap{
       position:relative;
-      min-height:610px;
+      min-height:560px;
       display:flex;align-items:center;justify-content:center;
       border-radius:var(--radius2);
       background:
@@ -238,7 +234,7 @@
 
     /* ===== Сцена справа: “карта с вопросом” ===== */
     .stage{
-      min-height: 610px;
+      min-height: 560px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -503,13 +499,6 @@
       mix-blend-mode:screen;
     }
     .fly-card.shine .fly-front::after{ animation: frontShine 900ms ease-out; }
-
-    /* финал */
-    .end{display:none;padding:22px 16px; text-align:center;}
-    .end .boom{font-size:46px}
-    .end .h1{font-size:22px;font-weight:950;margin-top:10px}
-    .end .p{color:var(--muted);margin-top:8px}
-    .stats{margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
   </style>
 </head>
 
@@ -521,15 +510,15 @@
   <div class="wrap">
     <div class="topbar">
       <div class="left">
+        <!-- ✅ правильное название -->
         <div class="title" id="uiTitle">Вытяни карту</div>
         <div class="subtitle" id="uiSubtitle">Нажмите на колоду, чтобы вытянуть случайную карту</div>
       </div>
 
       <div class="right">
-        <div class="mini" id="uiStepText">Карта 0 из 0</div>
+        <!-- ✅ оставляем только 1/3 (и прогресс-бар) -->
         <div class="counter" id="uiCounter">0 / 0</div>
 
-        <!-- ✅ без слова “Серия” -->
         <div class="chip" title="Текущая цепочка правильных ответов">
           <span class="dot"></span>
           <span>🔥 <b id="uiStreakNum">0</b></span>
@@ -538,6 +527,7 @@
         <div class="progress" aria-label="Прогресс">
           <div class="bar" id="uiBar"></div>
         </div>
+
         <div class="dots" id="uiDots" aria-label="Шаги"></div>
       </div>
     </div>
@@ -576,8 +566,6 @@
 
         <div class="panel-body">
           <div class="stage">
-
-            <!-- Карта справа с вопросом прямо на фронте -->
             <div class="display-card hidden" id="displayCard">
               <div class="display-inner" id="displayInner">
                 <div class="face back"></div>
@@ -589,8 +577,6 @@
                       <div style="display:flex;gap:8px;flex-wrap:wrap">
                         <span class="badge type" id="badgeType"><strong>Тип</strong>: —</span>
                         <span class="badge id" id="badgeId">ID: —</span>
-
-                        <!-- ✅ без слова “Серия” -->
                         <span class="badge score">🔥 <b id="badgeStreakNum">0</b></span>
                       </div>
                       <span class="badge meta" id="badgeMeta">—</span>
@@ -635,7 +621,6 @@
                 <button class="btn primary" id="btnRestart2">🔄 Сыграть ещё раз</button>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -690,7 +675,6 @@ const STATE = {
 const uiTitle = document.getElementById("uiTitle");
 const uiSubtitle = document.getElementById("uiSubtitle");
 const uiCounter = document.getElementById("uiCounter");
-const uiStepText = document.getElementById("uiStepText");
 const uiBar = document.getElementById("uiBar");
 const uiDots = document.getElementById("uiDots");
 const uiStreakNum = document.getElementById("uiStreakNum");
@@ -779,8 +763,8 @@ function updateProgressUI(){
   const maxToShow = getMaxToShow();
   const shown = Math.min(STATE.shown, maxToShow);
 
+  // ✅ только 1/3
   uiCounter.textContent = `${shown} / ${maxToShow}`;
-  uiStepText.textContent = `Карта ${shown} из ${maxToShow}`;
 
   const p = maxToShow > 0 ? (shown / maxToShow) * 100 : 0;
   uiBar.style.width = `${p}%`;
@@ -824,6 +808,7 @@ function resetGame(){
   STATE.streak = 0;
   STATE.bestStreak = 0;
 
+  // ✅ гарантируем корректное название слева
   uiTitle.textContent = CONFIG.meta.title || "Вытяни карту";
   uiSubtitle.textContent = CONFIG.meta.subtitle || "";
 
@@ -948,8 +933,8 @@ async function animateDrawToRightPanel(){
 
   const { fly, inner } = createFlyingCardEl();
 
-  const W = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cardW")) || 350;
-  const H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cardH")) || 480;
+  const W = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cardW")) || 320;
+  const H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cardH")) || 440;
 
   fly.style.left = (start.x - W/2) + "px";
   fly.style.top  = (start.y - H/2) + "px";
